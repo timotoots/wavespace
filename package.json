@@ -1,0 +1,27 @@
+{
+  "name": "wavespace",
+  "version": "1.0.0",
+  "description": "Browser-based spatial audio mixer",
+  "main": "sound.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timotoots/wavespace.git"
+  },
+  "keywords": [
+    "space",
+    "sound",
+    "mixer"
+  ],
+  "author": "Maajaam Studio",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/timotoots/wavespace/issues"
+  },
+  "homepage": "https://github.com/timotoots/wavespace#readme",
+  "dependencies": {
+    "split-pane": "^0.5.1"
+  }
+}

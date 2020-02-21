@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>Wavespace</title>
+
+		<!-- Space Scripts-->
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js'></script>
+		<script src="js/stats.min.js"></script>
+		<script src="js/OrbitControls.js"></script>
+		<script src="js/THREEx.KeyboardState.js"></script>
+		<script src="js/THREEx.FullScreen.js"></script>
+		<script src="js/THREEx.WindowResize.js"></script>
+
+		<!-- Sound Scripts -->
+	  <script type="text/javascript" src="https://rawgit.com/nexus-js/ui/master/dist/NexusUI.js"></script>
+
+
+
+		<link rel="stylesheet" href="./node_modules/split-pane/split-pane.css" />
+		<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+		<script src="./node_modules/split-pane/split-pane.js"></script>
+
+		<!-- The style sheet below is not part of the split-pane plugin. Feel free to use it, or style things your own way. -->
+		<!-- <link rel="stylesheet" href="../pretty-split-pane.css" /> -->
+
+		<style type="text/css">
+
+			html, body {
+				height: 100%;
+				min-height: 100%;
+				margin: 0;
+				padding: 0;
+			}
+
+			#left-component {
+				min-width: 10em;
+				right: 30em;
+				margin-right: 5px;
+			}
+
+			#my-divider {
+				right: 10em;
+				width: 5px;
+			}
+
+			#right-component {
+				width: 30em;
+			}
+
+
+			.pretty-split-pane-frame {
+				box-sizing: border-box;
+				width: 100%;
+				height: 100%;
+				padding: 5px;
+				background: silver;
+			}
+
+			.pretty-split-pane-frame .split-pane > .split-pane-divider.dragged.touch {
+				background: blue;
+				opacity: 0.25;
+			}
+
+			.pretty-split-pane-component-inner {
+				box-sizing: border-box;
+				border: 1px solid gray;
+				background: white;
+				width: 100%;
+				height: 100%;
+				padding: 0 0em;
+				overflow: hidden;
+
+			}
+
+
+
+			body { margin: 0; }
+			canvas { width: 100vw; height: 100vh; display: block; }
+
+
+
+		</style>
+
+		<script>
+			$(function() {
+				$('div.split-pane').splitPane();
+				$('button:first').on('click', function() {
+					$('div.split-pane').splitPane('lastComponentSize', 150);
+				});
+				$('button:last').on('click', function() {
+					$('div.split-pane').splitPane('firstComponentSize', 300);
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<div class="pretty-split-pane-frame">
+			<div class="split-pane fixed-right">
+				<div class="split-pane-component" id="left-component">
+					<div class="pretty-split-pane-component-inner" id="3dcanvas"></div>
+				</div>
+				<div class="split-pane-divider" id="my-divider"></div>
+				<div class="split-pane-component" id="right-component">
+					<div class="pretty-split-pane-component-inner">
+
+
+						<audio  controls autoplay2 crossorigin="anonymous">
+						  <source src="http://stream0.wfmu.org/freeform-128k" type="audio/mpeg">
+						</audio> 
+
+
+						<br />
+						<label for="left">Speaker 0</label>
+						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk0_slider" /><br />
+
+						<label for="left">Speaker 1</label>
+						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk1_slider" /><br />
+
+						<label for="right">Speaker 2</label>
+						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk2_slider" /><br />
+
+						<label for="right">Speaker 3</label>
+						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk3_slider" /><br />
+
+						<label for="right">Speaker 4</label>
+						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk4_slider" /><br />
+
+						<label for="left">Speaker 5</label>
+						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk5_slider" /><br />
+
+						<label for="right">Speaker 6</label>
+						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk6_slider" /><br />
+
+						<label for="right">Speaker 7</label>
+						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk7_slider" /><br />
+
+
+
+						<button>Button</button>
+
+						<div id="instrument"></div>
+						<div id="instrument2"></div>
+						<div id="message"></div>
+
+
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="space.js"></script>
+		<script type="text/javascript" src="sound.js"></script>
+
+
+	</body>
+</html>
