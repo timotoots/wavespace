@@ -22,6 +22,10 @@
   },
   "homepage": "https://github.com/timotoots/wavespace#readme",
   "dependencies": {
+    "express": "^4.17.1",
+    "http": "0.0.0",
+    "port": "^0.8.1",
+    "socket.io": "^2.3.0",
     "split-pane": "^0.5.1"
   }
 }

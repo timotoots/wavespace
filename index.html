@@ -15,8 +15,12 @@
 		<script src="js/THREEx.WindowResize.js"></script>
 
 		<!-- Sound Scripts -->
-	  <script type="text/javascript" src="https://rawgit.com/nexus-js/ui/master/dist/NexusUI.js"></script>
+		  <script src="http://localhost:3001/socket.io/socket.io.js"></script>
+		  <script type="text/javascript" src="https://rawgit.com/nexus-js/ui/master/dist/NexusUI.js"></script>
 
+	  	<!-- MQTT -->
+
+	 	 <script type="text/javascript" src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
 
 		<link rel="stylesheet" href="./node_modules/split-pane/split-pane.css" />
@@ -47,7 +51,7 @@
 			}
 
 			#right-component {
-				width: 30em;
+				width: 50em;
 			}
 
 
@@ -71,7 +75,7 @@
 				width: 100%;
 				height: 100%;
 				padding: 0 0em;
-				overflow: hidden;
+				/*overflow: hidden;*/
 
 			}
 
@@ -104,46 +108,10 @@
 				</div>
 				<div class="split-pane-divider" id="my-divider"></div>
 				<div class="split-pane-component" id="right-component">
-					<div class="pretty-split-pane-component-inner">
+					<div class="pretty-split-pane-component-inner" id="players">
 
 
-						<audio  controls autoplay2 crossorigin="anonymous">
-						  <source src="http://stream0.wfmu.org/freeform-128k" type="audio/mpeg">
-						</audio> 
-
-
-						<br />
-						<label for="left">Speaker 0</label>
-						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk0_slider" /><br />
-
-						<label for="left">Speaker 1</label>
-						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk1_slider" /><br />
-
-						<label for="right">Speaker 2</label>
-						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk2_slider" /><br />
-
-						<label for="right">Speaker 3</label>
-						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk3_slider" /><br />
-
-						<label for="right">Speaker 4</label>
-						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk4_slider" /><br />
-
-						<label for="left">Speaker 5</label>
-						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk5_slider" /><br />
-
-						<label for="right">Speaker 6</label>
-						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk6_slider" /><br />
-
-						<label for="right">Speaker 7</label>
-						<input type="range" min=0 max=1 step=.01 value=1 id="gain_spk7_slider" /><br />
-
-
-
-						<button>Button</button>
-
-						<div id="instrument"></div>
-						<div id="instrument2"></div>
-						<div id="message"></div>
+					<div id="message"></div>
 
 
 
@@ -152,6 +120,37 @@
 			</div>
 		</div>
 
+		<script type="text/javascript">
+			
+			var conf = {};
+			var state = {};
+
+			conf.speakers = {"1":1};
+
+			state.sounds = [
+				{
+					"id":0,
+					"url":"test/test1.mp3",
+					"state":"playing",
+					"speaker_distances":[10,12,123],
+					"light_distances":[12,12,11]
+				},
+				{
+					"id":1,
+					"url":"test/test2.mp3",
+					"state":"playing",
+					"speaker_distances":[10,12,123],
+					"light_distances":[12,12,11]
+				}
+			]
+
+
+			conf.spacesize_x = 2100;
+			conf.spacesize_y = 1400;
+			conf.spacesize_h = 400;
+
+		</script>
+		<script type="text/javascript" src="mqtt.js"></script>
 		<script type="text/javascript" src="space.js"></script>
 		<script type="text/javascript" src="sound.js"></script>
 
