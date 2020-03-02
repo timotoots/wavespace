@@ -1,0 +1,30 @@
+<html>
+<head>
+	<title>WaveSpace / Space</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link rel=stylesheet href="css/style.css">
+
+	<!-- Space Scripts-->
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js'></script>
+	<script src="js/stats.min.js"></script>
+	<script src="js/OrbitControls.js"></script>
+	<script src="js/THREEx.KeyboardState.js"></script>
+	<script src="js/THREEx.FullScreen.js"></script>
+	<script src="js/THREEx.WindowResize.js"></script>
+</head>
+<body>
+
+<div id="message"></div>
+
+<div id="infoBox" title="Demo Information">
+	Controls: Up/Down arrow: move in global Z direction,Left/Right arrow: move in global X direction,A/D: rotate left/right
+</div>
+<!-- ------------------------------------------------------------ -->
+
+<div id="3dcanvas" style="z-index: 2;"></div>
+
+<script src="space.js"></script>
+
+</body>
+</html>

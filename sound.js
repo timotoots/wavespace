@@ -3,13 +3,14 @@
 
 // Socket input
 
-  var socket = io("http://localhost:3001",{ transports: ['websocket', 'polling'] });
+  var socket = io(conf.wavespace_server,{ transports: ['websocket', 'polling'] });
 
   socket.on('message', function(msg){
     console.log(msg);
     document.getElementById("message").innerHTML = msg;
   });
 
+var players = [];
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -22,9 +23,11 @@
   [5,187,105]
   ];
 
+var spaceDimensions = [210,140];
+
+/*
 var speakers = [];
 
-var spaceDimensions = [210,140];
 
 
 for (var i = 0; i < speakersInSpace.length; i++) {
@@ -36,7 +39,7 @@ for (var i = 0; i < speakersInSpace.length; i++) {
 
 }
 
-  
+  */
 
 
 
@@ -71,13 +74,45 @@ function testNextSpeaker(){
    testCounter++;
    playToSpeaker(testCounter);
 
-   if(testCounter<8){
+   if(testCounter<16){
        setTimeout(function(){
         testNextSpeaker();
     },5000);
      } else {
       console.log("All speakers tested");
      }
+
+}
+
+function playToSpeaker(ch){
+
+console.log("Test speaker" + ch);
+
+for (var i = 0; i < players.length; i++) {
+
+  players[i].audioElement.pause();
+
+}
+
+players[0].audioElement.src = 'data/'+ch+'.wav';
+
+players[0].audioElement.play();
+
+var msg = [1];
+
+for (var i = 0; i < 16; i++) {
+
+  if(i==ch){
+    msg.push(1);
+  } else {
+    msg.push(0);
+  }
+}
+
+socket.emit('message', msg.join(" "));
+
+
+
 
 }
 
@@ -88,11 +123,12 @@ function testNextSpeaker(){
 document.addEventListener('DOMContentLoaded', function() {
 
 
-// testNextSpeaker();
 
 	for (var i = 0; i < maxPlayers; i++) {
 		  createPlayer(i);
 	}
+
+  // testNextSpeaker();
 
 
 });
@@ -143,7 +179,7 @@ function createPlayer(i){
 
   ////////////////////////
   // UI Element: 2D Panner
-
+/*
   var pan2d =  Nexus.Add.Pan2D('#player'+i,{
     'size': [spaceDimensions[0]*1,spaceDimensions[1]*1],
     'range': 0.4,  // detection radius of each speaker
@@ -163,7 +199,7 @@ function createPlayer(i){
      // console.log(v);
 
   });
-
+*/
   //////////////////////
   // UI Element: Joystick
 
@@ -182,10 +218,12 @@ function createPlayer(i){
 
   position.on('change',function(v) {
 
+    soundShapes[i].position.x = mapValues(v.x,0,1,0,conf.spacesize_x);
+    soundShapes[i].position.z = mapValues(v.y,0,1,0,conf.spacesize_y);
+  
 
-
-    MovingCube.position.x = mapValues(v.x,0,1,0,conf.spacesize_x);
-    MovingCube.position.z = mapValues(v.y,0,1,0,conf.spacesize_y);
+    // MovingCube.position.x = mapValues(v.x,0,1,0,conf.spacesize_x);
+    // MovingCube.position.z = mapValues(v.y,0,1,0,conf.spacesize_y);
 
     //console.log(v);
   })

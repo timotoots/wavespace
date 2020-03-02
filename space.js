@@ -14,19 +14,11 @@ var collidableMeshList = [];
 var arrowList = [];
 var directionList = [];
 
-	var box = new THREE.Box3();
+var box = new THREE.Box3();
 var wall;
 
 var soundShapes = [];
-
- var speakersInSpace = [
-  [0,12,20],
-  [1,125,53],
-  [2,196,12],
-  [6,89,88],
-  [7,30,105],
-  [5,187,105]
-  ];
+var speakers = [];
 
 init();
 animate();
@@ -36,27 +28,28 @@ function createSoundshape(id){
 	var wallGeometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 	var wallMaterial = new THREE.MeshBasicMaterial( {color: 0x8888ff} );
 
-	var shape = new THREE.Mesh(wallGeometry, wallMaterial);
-	shape.position.set(100+id*100, 50, -100+id*100);
-	shape.shapeType = "sound";
-	shape.name = id;
-	shape.geometry.computeBoundingBox();
-	scene.add(shape);
+	soundShapes[id] = new THREE.Mesh(wallGeometry, wallMaterial);
+	soundShapes[id].position.set(100+id*100, 50, -100+id*100);
+	soundShapes[id].shapeType = "sound";
+	soundShapes[id].name = id;
+	soundShapes[id].lastPosition = [0,0,0]//{"x":0,"y":0,"z":0};
+
+	soundShapes[id].geometry.computeBoundingBox();
+	scene.add(soundShapes[id]);
 
 }
 
 
-	console.log(speakersInSpace);
 
 function createSpeaker(id){
 
 	var cubeGeometry = new THREE.BoxBufferGeometry( 10, 120, 60 );
 	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x424141, wireframe:true } );
-	var speaker = new THREE.Mesh( cubeGeometry, wireMaterial );
-	speaker.position.set(speakersInSpace[id][1]*10,100,speakersInSpace[id][2]*10);
-	speaker.shapeType = "speaker";
-	speaker.name = id;
-	scene.add( speaker );	
+	speakers[id] = new THREE.Mesh( cubeGeometry, wireMaterial );
+	speakers[id].position.set(conf.speakers[id][1]*10,100,conf.speakers[id][2]*10);
+	speakers[id].shapeType = "speaker";
+	speakers[id].name = id;
+	scene.add( speakers[id] );	
 	
 
 }
@@ -162,9 +155,10 @@ function init()
 	
 	
 	createSoundshape(0);
-	createSoundshape(1);
+	// createSoundshape(1);
 
-	for (var i = 0; i < speakersInSpace.length; i++) {
+
+	for (var i = 0; i < conf.speakers.length; i++) {
 		createSpeaker(i);
 	}
 	
@@ -187,10 +181,41 @@ function animate()
 	update();
 }
 
-function update()
-{
+function calculateSoundDistances(sound_id){
 
+	// if(sound_id==0){
 
+	// console.log(soundShapes[sound_id].position);
+	// console.log(soundShapes[sound_id].lastPosition);
+
+	// }
+
+	var curPos = [ soundShapes[sound_id].position.x,soundShapes[sound_id].position.y,soundShapes[sound_id].position.z];
+
+	if(soundShapes[sound_id].lastPosition[0] != curPos[0] || soundShapes[sound_id].lastPosition[1] != curPos[1] || soundShapes[sound_id].lastPosition[2] != curPos[2]){
+
+		var boundingBox = new THREE.Box3();
+		boundingBox.copy( soundShapes[sound_id].geometry.boundingBox ).applyMatrix4( soundShapes[sound_id].matrixWorld );
+
+		var speakerDistances = [];
+		var lightDistances = [];
+
+		for (var i = 0; i < speakers.length; i++) {
+			var originPoint = speakers[i].position.clone();
+			speakerDistances.push(boundingBox.distanceToPoint(originPoint));
+		}
+
+		// TODO: calculate light distances
+	
+		soundShapes[sound_id].speakerDistances = speakerDistances;
+		soundShapes[sound_id].lastPosition = curPos;
+		//console.log(soundShapes[sound_id].lastPosition);
+
+	} 
+
+}
+
+function update(){
 
 
 	resizeCanvasToDisplaySize();
@@ -213,6 +238,12 @@ function update()
 	if ( keyboard.pressed("down") )
 		MovingCube.position.z += moveDistance;
 
+
+	for (var i = 0; i < soundShapes.length; i++) {
+		calculateSoundDistances(i);
+	}
+
+	/*
 	var originPoint = MovingCube.position.clone();
 
 	var text = "";
@@ -237,7 +268,7 @@ function update()
 
 	appendText(text);
 
-	
+	*/
 
 	controls.update();
 	stats.update();
@@ -248,4 +279,35 @@ function render()
 	renderer.render( scene, camera );
 }
 
+setInterval(function(){
+
+	var text = "";
+	
+
+	for (var i = 0; i < soundShapes.length; i++) {
+
+		var msg = [i+1];
+
+		for (var j = 0; j < soundShapes[i].speakerDistances.length; j++) {
+			if(soundShapes[i].speakerDistances[j]<100){
+				msg.push(1)
+			} else {
+				msg.push(0);
+			}
+			
+		}
+
+		socket.emit('message', msg.join(" "));
+
+		// console.log("Speaker distances for sound " + i);
+		// console.log(soundShapes[i].speakerDistances);
+		text += "Speaker distances for sound " + i +": ";
+		text += soundShapes[i].speakerDistances;
+		text += " / ";
+		text += soundShapes[i].lastPosition[1]; 
+		text += " / ";
+		text += soundShapes[i].lastPosition[0]; 	}
+		appendText(text);
+
+},100);
 
