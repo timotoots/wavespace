@@ -130,6 +130,8 @@ io.on('connection', function(socket){
 const chromeLauncher = require('chrome-launcher');
 
 const newFlags = chromeLauncher.Launcher.defaultFlags().filter(flag => flag !== '--mute-audio');
+
+newFlags.push("--kiosk");
 /*
 chromeLauncher.launch({
   startingUrl: 'https://google.com'
