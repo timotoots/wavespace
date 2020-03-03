@@ -28,11 +28,19 @@ function createSoundshape(id){
 	var wallGeometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 	var wallMaterial = new THREE.MeshBasicMaterial( {color: 0x8888ff} );
 
+
+
 	soundShapes[id] = new THREE.Mesh(wallGeometry, wallMaterial);
 	soundShapes[id].position.set(100+id*100, 50, -100+id*100);
 	soundShapes[id].shapeType = "sound";
 	soundShapes[id].name = id;
 	soundShapes[id].lastPosition = [0,0,0]//{"x":0,"y":0,"z":0};
+	soundShapes[id].positionChanged = 0;
+
+
+
+	soundShapes[id].material.color =  new THREE.Color("rgb("+conf.players[id].r+", "+conf.players[id].g+", "+conf.players[id].b+")");
+		
 
 	soundShapes[id].geometry.computeBoundingBox();
 	scene.add(soundShapes[id]);
@@ -40,18 +48,18 @@ function createSoundshape(id){
 }
 
 
-
 function createSpeaker(id){
 
 	var cubeGeometry = new THREE.BoxBufferGeometry( 10, 120, 60 );
-	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x424141, wireframe:true } );
+	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x424141 } );
 	speakers[id] = new THREE.Mesh( cubeGeometry, wireMaterial );
 	speakers[id].position.set(conf.speakers[id][1]*10,100,conf.speakers[id][2]*10);
 	speakers[id].shapeType = "speaker";
 	speakers[id].name = id;
+	speakers[id].brightness = [];
+	speakers[id].material.color  = new THREE.Color("rgb(0, 0, 0)");
 	scene.add( speakers[id] );	
 	
-
 }
 
 function resizeCanvasToDisplaySize() {
@@ -73,6 +81,8 @@ function resizeCanvasToDisplaySize() {
   }
 
 }
+
+var ellipse, curve;
 
 // FUNCTIONS 		
 function init() 
@@ -125,7 +135,7 @@ function init()
 	// FLOOR
 	//2100 1400
 	var floorMaterial = new THREE.MeshBasicMaterial( {color:0x666666, side:THREE.DoubleSide} );
-	var floorGeometry = new THREE.PlaneGeometry(conf.spacesize_x,conf.spacesize_y, 1, 1);
+	var floorGeometry = new THREE.PlaneGeometry(conf.dimensions.x,conf.dimensions.y, 1, 1);
 	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
 	floor.position.y = -0.5;
 	floor.position.z = 700;
@@ -146,6 +156,30 @@ function init()
 	////////////
 	// CUSTOM //
 	////////////
+	 curve = new THREE.EllipseCurve(
+		0,  0,            // ax, aY
+		1000, 1000,           // xRadius, yRadius
+		0,  2 * Math.PI,  // aStartAngle, aEndAngle
+		false,            // aClockwise
+		0                 // aRotation
+	);
+
+	var points = curve.getPoints( 50 );
+	var geometry = new THREE.BufferGeometry().setFromPoints( points );
+
+	var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+
+	// Create the final object to add to the scene
+	ellipse = new THREE.Line( geometry, material );
+	ellipse.rotation.set(degrees_to_radians(90), 0, 0);
+
+	scene.add(ellipse);
+
+
+
+	////////////
+	// CUSTOM //
+	////////////	
 
 	var cubeGeometry = new THREE.CubeGeometry(50,50,50,1,1,1);
 	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe:true } );
@@ -153,11 +187,10 @@ function init()
 	MovingCube.position.set(0, 25.1, 0);
 	scene.add( MovingCube );
 	
+	for (var i = 0; i < conf.maxPlayers; i++) {
+		createSoundshape(i);
+	}
 	
-	createSoundshape(0);
-	// createSoundshape(1);
-
-
 	for (var i = 0; i < conf.speakers.length; i++) {
 		createSpeaker(i);
 	}
@@ -199,23 +232,54 @@ function calculateSoundDistances(sound_id){
 
 		var speakerDistances = [];
 		var lightDistances = [];
+		var gains = [];
 
 		for (var i = 0; i < speakers.length; i++) {
 			var originPoint = speakers[i].position.clone();
-			speakerDistances.push(boundingBox.distanceToPoint(originPoint));
+			var dist = boundingBox.distanceToPoint(originPoint);
+			speakerDistances.push(dist);
+
+			// Calculate gains
+			var gain = mapValues(dist,0, 500, 1, 0);
+			if(gain < 0){
+				gain = 0;
+			}
+			gains.push(gain);
+
+			// Calculate 3D speaker brighness
+			var brightness = mapValues(gain,0, 1, 0, 255, true);
+			speakers[i].material.color  = new THREE.Color('rgb('+brightness+'%, '+brightness+'%, '+brightness+'%)');
+
 		}
 
+
 		// TODO: calculate light distances
-	
+		soundShapes[sound_id].gains = gains;
 		soundShapes[sound_id].speakerDistances = speakerDistances;
 		soundShapes[sound_id].lastPosition = curPos;
-		//console.log(soundShapes[sound_id].lastPosition);
+		soundShapes[sound_id].positionChanged = 1;
+
+
 
 	} 
 
 }
 
 function update(){
+
+
+	var time = Date.now();
+	var looptime = 20 * 1000;
+	var t = ( time % looptime ) / looptime;
+
+	var pos = curve.getPointAt( t );
+	MovingCube.position.x = pos.x;
+	MovingCube.position.y = 0;
+	MovingCube.position.z = pos.y;
+
+	soundShapes[1].position.x = pos.x;
+	soundShapes[1].position.y = 0;
+	soundShapes[1].position.z = pos.y;
 
 
 	resizeCanvasToDisplaySize();
@@ -237,6 +301,8 @@ function update(){
 		MovingCube.position.z -= moveDistance;
 	if ( keyboard.pressed("down") )
 		MovingCube.position.z += moveDistance;
+
+
 
 
 	for (var i = 0; i < soundShapes.length; i++) {
@@ -281,33 +347,33 @@ function render()
 
 setInterval(function(){
 
-	var text = "";
 	
 
 	for (var i = 0; i < soundShapes.length; i++) {
 
-		var msg = [i+1];
+		if(soundShapes[i].positionChanged==1){
 
-		for (var j = 0; j < soundShapes[i].speakerDistances.length; j++) {
-			if(soundShapes[i].speakerDistances[j]<100){
-				msg.push(1)
-			} else {
-				msg.push(0);
-			}
+			soundShapes[i].positionChanged = 0;
+
+			soundSendSpeakers(i,soundShapes[i].gains);
+
+			// console.log("Speaker distances for sound " + i);
+			// console.log(soundShapes[i].speakerDistances);
+			var text = "";
+			text += "Speaker distances for sound " + i +": ";
+			text += soundShapes[i].speakerDistances;
+			text += " / ";
+			text += soundShapes[i].lastPosition[1]; 
+			text += " / ";
+			text += soundShapes[i].lastPosition[0]; 
+			appendText(text);
+
+		} // if positionChanged
 			
+
 		}
 
-		socket.emit('message', msg.join(" "));
 
-		// console.log("Speaker distances for sound " + i);
-		// console.log(soundShapes[i].speakerDistances);
-		text += "Speaker distances for sound " + i +": ";
-		text += soundShapes[i].speakerDistances;
-		text += " / ";
-		text += soundShapes[i].lastPosition[1]; 
-		text += " / ";
-		text += soundShapes[i].lastPosition[0]; 	}
-		appendText(text);
 
-},100);
+},300);
 

@@ -56,10 +56,8 @@ const button = document.querySelector('button');
 
   Nexus.context = context;
 
-  var maxPlayers = 4;
-
-  if(context.destination.maxChannelCount < maxPlayers){
-    maxPlayers = context.destination.maxChannelCount;
+  if(context.destination.maxChannelCount < conf.maxPlayers ){
+    conf.maxPlayers  = context.destination.maxChannelCount;
   }
 
 
@@ -115,6 +113,23 @@ socket.emit('message', msg.join(" "));
 
 
 }
+////////////////////////////////////////////////////////////////////////
+
+function soundSendSpeakers(i,gains){
+
+  if(typeof players[i] != "undefined"){
+
+
+    players[i].multislider.setAllSliders(gains);
+
+    gains.unshift(i+1);
+
+    socket.emit('message', gains.join(" "));
+
+  }
+
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -124,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-	for (var i = 0; i < maxPlayers; i++) {
+	for (var i = 0; i < conf.maxPlayers; i++) {
 		  createPlayer(i);
 	}
 
@@ -168,7 +183,7 @@ function createPlayer(i){
   // Audio routing from mono to separate output channels
   var source = context.createMediaElementSource(players[i].audioElement);
   var splitter = context.createChannelSplitter(2);
-  var merger = context.createChannelMerger(maxPlayers);
+  var merger = context.createChannelMerger(conf.maxPlayers);
   source.connect(splitter);
   splitter.connect(merger, 0, i);
   merger.connect(context.destination);
@@ -218,8 +233,8 @@ function createPlayer(i){
 
   position.on('change',function(v) {
 
-    soundShapes[i].position.x = mapValues(v.x,0,1,0,conf.spacesize_x);
-    soundShapes[i].position.z = mapValues(v.y,0,1,0,conf.spacesize_y);
+    soundShapes[i].position.x = mapValues(v.x,0,1,0,conf.dimensions.x);
+    soundShapes[i].position.z = mapValues(v.y,0,1,0,conf.dimensions.y);
   
 
     // MovingCube.position.x = mapValues(v.x,0,1,0,conf.spacesize_x);
@@ -242,7 +257,7 @@ function createPlayer(i){
 
   slider.on('change',function(v) {
 
-    MovingCube.position.y = mapValues(v,0,1,0,conf.spacesize_h);
+    MovingCube.position.y = mapValues(v,0,1,0,conf.dimensions.z);
 
     //console.log(v);
   })
@@ -269,25 +284,5 @@ players[i].multislider =  Nexus.Add.Multislider('#player'+i,{
 
 }
 
-/////////////////////////////////////////////////////////////////////////////////
-
-// Helpful functions
-
-function mapValues(value,in_min, in_max, out_min, out_max, rounded = false) {
-    var val = (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-    if(rounded==true){
-        return Math.round(val);
-    } else {
-        val = toFixedNumber(val,3);
-        return val;
-
-    }
-  
-}
-
-function toFixedNumber(number, digits, base){
-  var pow = Math.pow(base||10, digits);
-  return Math.round(number*pow) / pow;
-}
 
 /////////////////////////////////////////////////////////////////////////////////

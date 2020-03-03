@@ -7,11 +7,24 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http, { origins: '*:*'});
+var path = require('path');
 
 ////////////////////////////////////////////////////////////////////////
+
+var os = require("os");
+//os.hostname();
+
+var conf = require('../conf/'+os.hostname()+".js");
+conf = conf.getConf();
+
+conf.wavespace_server = 'http://'+os.hostname() +":"+ conf.wavespace_port;
+
+console.log(conf.wavespace_server);
+
 // Start Pd
 
 var port = require('port');
@@ -21,7 +34,7 @@ var pd = port({
 		'write': 8006,
 		'encoding': 'ascii',
 		'basepath': __dirname,
-		'pd':'/Applications/Pd-0.50-0.app/Contents/Resources/bin/pd',
+		'pd':conf.pdBin,
 		'flags': {
 			'noprefs': true,
 			'stderr': true,
@@ -64,20 +77,26 @@ var pd = port({
 ////////////////////////////////////////////////////////////////////////
 // Serve static files
 
-app.get('/', function(req, res){
+app.use(express.static(path.join(__dirname, '../client'))); //  "public" off of current is root
+app.use('/node_modules', express.static(path.join(__dirname, '../node_modules')));
+app.use('/data', express.static(path.join(__dirname, '../data')));
 
-  //send the index.html file for all requests
-  res.sendFile(__dirname + '/index.html');
+// Config for the client
+app.get('/conf.js', function(req, res){
+
+    res.setHeader('Content-Type', 'application/javascript');
+    res.end('var conf=' + JSON.stringify(conf));
 
 });
+
 
 
 ////////////////////////////////////////////////////////////////////////
 // Socket connection
 
-http.listen(3001, function(){
+http.listen(conf.wavespace_port, function(){
 
-  console.log('listening on *:3001');
+  console.log('listening on *:'+conf.wavespace_port);
 
 });
 
