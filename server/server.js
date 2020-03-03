@@ -16,15 +16,14 @@ var path = require('path');
 ////////////////////////////////////////////////////////////////////////
 
 var os = require("os");
+var hostname = os.hostname();
 
-if(os.indexOf(".local")==-1){
-	os = os+'.local';
-}
+hostname = hostname.replace('.local', '');
 
-var conf = require('../conf/'+os.hostname()+".js");
+var conf = require('../conf/'+hostname+".js");
 conf = conf.getConf();
 
-conf.wavespace_server = 'http://'+os.hostname() +":"+ conf.wavespace_port;
+conf.wavespace_server = 'http://'+hostname +".local:"+ conf.wavespace_port;
 
 console.log(conf.wavespace_server);
 
