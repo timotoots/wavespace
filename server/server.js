@@ -129,8 +129,14 @@ io.on('connection', function(socket){
 
 const ChromeLauncher = require('chrome-launcher');
 
-const newFlags = ChromeLauncher.defaultFlags().filter(flag => flag !== '--mute-audio');
+//const newFlags = ChromeLauncher.defaultFlags().filter(flag => flag !== '--mute-audio');
 
+ChromeLauncher.launch({
+  startingUrl: 'https://google.com'
+}).then(chrome => {
+  console.log(`Chrome debugging port running on ${chrome.port}`);
+});
+/*
 ChromeLauncher.launch({
   ignoreDefaultFlags: true,
   chromeFlags: newFlags,
@@ -138,6 +144,7 @@ ChromeLauncher.launch({
 }).then(chrome => {
   console.log(`Chrome debugging port running on ${chrome.port}`);
 });
+*/
 
 ////////////////////////////////////////////////////////////////////////
 // Testing
