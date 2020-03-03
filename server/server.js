@@ -125,6 +125,19 @@ io.on('connection', function(socket){
 
 
 });
+////////////////////////////////////////////////////////////////////////
+
+const ChromeLauncher = require('chrome-launcher');
+
+const newFlags = ChromeLauncher.defaultFlags().filter(flag => flag !== '--mute-audio');
+
+ChromeLauncher.launch({
+  ignoreDefaultFlags: true,
+  chromeFlags: newFlags,
+  startingUrl: conf.wavespace_server
+}).then(chrome => {
+  console.log(`Chrome debugging port running on ${chrome.port}`);
+});
 
 ////////////////////////////////////////////////////////////////////////
 // Testing
