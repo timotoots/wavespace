@@ -16,7 +16,10 @@ var path = require('path');
 ////////////////////////////////////////////////////////////////////////
 
 var os = require("os");
-//os.hostname();
+
+if(os.indexOf(".local")==-1){
+	os = os+'.local';
+}
 
 var conf = require('../conf/'+os.hostname()+".js");
 conf = conf.getConf();
