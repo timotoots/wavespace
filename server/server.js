@@ -132,6 +132,8 @@ const chromeLauncher = require('chrome-launcher');
 const newFlags = chromeLauncher.Launcher.defaultFlags().filter(flag => flag !== '--mute-audio');
 
 newFlags.push("--kiosk");
+
+console.log(newFlags);
 /*
 chromeLauncher.launch({
   startingUrl: 'https://google.com'
