@@ -40,6 +40,7 @@ var pd = port({
 		'flags': {
 			'noprefs': true,
 			'stderr': true,
+			'nogui':conf.pdNoGui,
 			'send': 'pd dsp 0, dsp 1',
 			'inchannels':'4',
 			'outchannels':'16',
@@ -127,27 +128,31 @@ io.on('connection', function(socket){
 });
 ////////////////////////////////////////////////////////////////////////
 
-const chromeLauncher = require('chrome-launcher');
+if(conf.launchChrome){
 
-const newFlags = chromeLauncher.Launcher.defaultFlags().filter(flag => flag !== '--mute-audio');
+	const chromeLauncher = require('chrome-launcher');
 
-newFlags.push("--kiosk");
+	const newFlags = chromeLauncher.Launcher.defaultFlags().filter(flag => flag !== '--mute-audio');
 
-console.log(newFlags);
-/*
-chromeLauncher.launch({
-  startingUrl: 'https://google.com'
-}).then(chrome => {
-  console.log(`Chrome debugging port running on ${chrome.port}`);
-});
-*/
-chromeLauncher.launch({
-  ignoreDefaultFlags: true,
-  chromeFlags: newFlags,
-  startingUrl: conf.wavespace_server
-}).then(chrome => {
-  console.log(`Chrome debugging port running on ${chrome.port}`);
-});
+	newFlags.push("--kiosk");
+
+	console.log(newFlags);
+	/*
+	chromeLauncher.launch({
+	  startingUrl: 'https://google.com'
+	}).then(chrome => {
+	  console.log(`Chrome debugging port running on ${chrome.port}`);
+	});
+	*/
+	chromeLauncher.launch({
+	  ignoreDefaultFlags: true,
+	  chromeFlags: newFlags,
+	  startingUrl: conf.wavespace_server
+	}).then(chrome => {
+	  console.log(`Chrome debugging port running on ${chrome.port}`);
+	});
+
+}
 
 
 ////////////////////////////////////////////////////////////////////////

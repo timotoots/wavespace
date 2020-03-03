@@ -78,6 +78,8 @@ conf.wavespace_port = 3001;
 conf.pdBin = '/Applications/Pd-0.50-0.app/Contents/Resources/bin/pd';
 
 conf.launchChrome = false;
+conf.pdNoGui = false;
+
 
 /////////////////////////////////////
 

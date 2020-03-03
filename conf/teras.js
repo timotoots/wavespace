@@ -8,6 +8,7 @@ conf = conf.getConf();
 
 conf.pdBin = '/bin/pd';
 conf.launchChrome = true;
+conf.pdNoGui = true;
 
 
 /////////////////////////////////////
