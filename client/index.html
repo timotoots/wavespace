@@ -3,8 +3,16 @@
 	<head>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-		<title>Wavespace</title>
+
+    	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    		<title>Wavespace</title>
+
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+		<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
 		<!-- Space Scripts-->
 		<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js'></script>
@@ -23,9 +31,7 @@
 	 	 <script type="text/javascript" src="/node_modules/mqtt/dist/mqtt.min.js"></script>
 
 
-		<link rel="stylesheet" href="/node_modules/split-pane/split-pane.css" />
 		<script src="/node_modules/jquery/dist/jquery.min.js"></script>
-		<script src="/node_modules/split-pane/split-pane.js"></script>
 
 		<!-- The style sheet below is not part of the split-pane plugin. Feel free to use it, or style things your own way. -->
 		<!-- <link rel="stylesheet" href="../pretty-split-pane.css" /> -->
@@ -39,91 +45,150 @@
 				padding: 0;
 			}
 
-			#left-component {
-				min-width: 10em;
-				right: 30em;
-				margin-right: 5px;
-			}
-
-			#my-divider {
-				right: 10em;
-				width: 5px;
-			}
-
-			#right-component {
-				width: 50em;
-			}
+		* {
+  box-sizing: border-box;
+}
 
 
-			.pretty-split-pane-frame {
-				box-sizing: border-box;
-				width: 100%;
-				height: 100%;
-				padding: 5px;
-				background: silver;
-			}
+.sidebar-toggle {
+  position: absolute;
+  bottom: 1em;
+  right:1em;
+  z-index: 10;
+  border: 1px solid #fff;
+  outline: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-left: 18.8em;
+  margin-top: 1em;
+  background-color: yellow;
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+  cursor: pointer;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+.sidebar-toggle.is-closed {
+  -webkit-transform:  rotate(0deg);
+          transform:  rotate(0deg);
+}
+.sidebar-toggle .icon {
+  font-size: 1.5rem;
+  color: #fff;
+}
 
-			.pretty-split-pane-frame .split-pane > .split-pane-divider.dragged.touch {
-				background: blue;
-				opacity: 0.25;
-			}
+#three_canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	z-index: 9;
 
-			.pretty-split-pane-component-inner {
-				box-sizing: border-box;
-				border: 1px solid gray;
-				background: white;
-				width: 100%;
-				height: 100%;
-				padding: 0 0em;
-				/*overflow: hidden;*/
+		/* Initially we don't want any height, and we want the contents to be hidden */
+	height: 50vh;
+	overflow: hidden;
 
-			}
+	/* Set our transitions up. 
+	-webkit-transition: max-height 0.1s;
+	-moz-transition: max-height 0.1s;
+	transition: max-height 0.1s;
+*/
+}
+#three_canvas.is-closed{
+	height: 100vh;
 
 
+}
 
-			body { margin: 0; }
-			canvas { width: 100vw; height: 100vh; display: block; }
 
+.sidebar {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100vw;
+	height: 50vh;
+	background-color: #fff;
+	-webkit-transition: .7s;
+	transition: .7s;
+}
+.sidebar.is-closed {
+  -webkit-transform: translateY(+50vh);
+          transform: translateY(+50vh);
+}
+
+#header{
+	font-size: 9px;
+	position: absolute;
+	right: 10px;
+	top:0;
+	z-index: 11;
+	color: white;
+}
+
+.player{
+	background: gray;
+}
+
+
+audio{
+	 transform: scale(0.7);
+
+}
 
 
 		</style>
 
 		<script>
 			$(function() {
-				$('div.split-pane').splitPane();
+				/*
 				$('button:first').on('click', function() {
 					$('div.split-pane').splitPane('lastComponentSize', 150);
 				});
 				$('button:last').on('click', function() {
 					$('div.split-pane').splitPane('firstComponentSize', 300);
 				});
+				*/
 			});
 		</script>
 	</head>
 	<body>
-		<div class="pretty-split-pane-frame">
-			<div class="split-pane fixed-right">
-				<div class="split-pane-component" id="left-component">
-					<div class="pretty-split-pane-component-inner" id="3dcanvas"></div>
-				</div>
-				<div class="split-pane-divider" id="my-divider"></div>
-				<div class="split-pane-component" id="right-component">
-					<div class="pretty-split-pane-component-inner" id="players">
+
+<div id="header">Wavespace / MAAJAAM STUDIO</div>
+
+<div id="three_canvas">
+	<div id="buttons"><button class="sidebar-toggle"><i class="fa fa-plus icon"></i></button></div>
+</div>
+
+<div class="sidebar ">
+	<div class="row"><div id="message" class="col-12"></div></div>
+
+	<div id="players" class="row"></div>
+</div>
 
 
-					<div id="message"></div>
-
-
-
-					</div>
-				</div>
-			</div>
-		</div>
 		<script type="text/javascript" src="js/functions.js"></script>
 		<script type="text/javascript" src="/conf.js"></script>
 		<script type="text/javascript" src="js/mqtt.js"></script>
 		<script type="text/javascript" src="js/space.js"></script>
 		<script type="text/javascript" src="js/sound.js"></script>
+		<script type="text/javascript">
+			var toggleBtn = document.querySelector('.sidebar-toggle');
+			var sidebar = document.querySelector('.sidebar');
+			var threediv = document.querySelector('#three_canvas');
+		
+
+			toggleBtn.addEventListener('click', function() {
+			  toggleBtn.classList.toggle('is-closed');
+			  sidebar.classList.toggle('is-closed');
+			  threediv.classList.toggle('is-closed');
+
+			})
+
+
+
+
+		</script>
 
 
 	</body>

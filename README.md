@@ -29,7 +29,7 @@ sudo apt install puredata
 
 * Install Chromium
 ```
-sudo apt install chromium
+sudo apt install chromium-browser
 ```
 
 * Install Node JS and NPM

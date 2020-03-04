@@ -54,7 +54,13 @@ const button = document.querySelector('button');
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   context = new AudioContext();
 
+  context.destination.channelInterpretation = 'discrete';
+  context.destination.channelCountMode = 'explicit';
+  context.destination.channelCount = context.destination.maxChannelCount;
+
   Nexus.context = context;
+
+  console.log("You sound card has " + context.destination.maxChannelCount  + " channels.")
 
   if(context.destination.maxChannelCount < conf.maxPlayers ){
     conf.maxPlayers  = context.destination.maxChannelCount;
@@ -162,9 +168,7 @@ function createPlayer(i){
   // Create wrapper div
   var div = document.createElement('div');
   div.id = 'player' + i;
-  div.className = 'block';
-  div.style.float = 'left';
-  div.style.padding = '1em';
+  div.className = 'col-3 player border border-warning';
   document.getElementById("players").appendChild(div);
 
 
@@ -177,6 +181,7 @@ function createPlayer(i){
   players[i].audioElement.autoplay = true;
   players[i].audioElement.loop = true;
   players[i].audioElement.style.display = "inline";
+
   players[i].audioElement.controls = true;
   div.appendChild(players[i].audioElement);
 

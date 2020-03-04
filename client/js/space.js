@@ -64,7 +64,7 @@ function createSpeaker(id){
 
 function resizeCanvasToDisplaySize() {
 
-  const parentdiv = document.getElementById("3dcanvas").getBoundingClientRect();
+  const parentdiv = document.getElementById("three_canvas").getBoundingClientRect();
   const canvas = renderer.domElement;
   const width = parentdiv.width;
   const height = parentdiv.height;
@@ -72,6 +72,7 @@ function resizeCanvasToDisplaySize() {
   
   if (canvas.width !== width ||canvas.height !== height) {
   	document.querySelector("canvas").style.width = width+"px";
+  	document.querySelector("canvas").style.height = height+"px";
     // you must pass false here or three.js sadly fights the browser
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
@@ -105,7 +106,7 @@ function init()
 	renderer = new THREE.WebGLRenderer( {antialias:true} );
 	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	renderer.setPixelRatio( window.devicePixelRatio );
-	container = document.getElementById( '3dcanvas' );
+	container = document.getElementById( 'three_canvas' );
 	container.appendChild( renderer.domElement );
 	// EVENTS
 	THREEx.WindowResize(renderer, camera);
@@ -156,6 +157,9 @@ function init()
 	////////////
 	// CUSTOM //
 	////////////
+	
+	// https://threejs.org/examples/#webgl_geometry_extrude_splines
+
 	 curve = new THREE.EllipseCurve(
 		0,  0,            // ax, aY
 		1000, 1000,           // xRadius, yRadius
@@ -359,6 +363,7 @@ setInterval(function(){
 
 			// console.log("Speaker distances for sound " + i);
 			// console.log(soundShapes[i].speakerDistances);
+			/*
 			var text = "";
 			text += "Speaker distances for sound " + i +": ";
 			text += soundShapes[i].speakerDistances;
@@ -367,6 +372,7 @@ setInterval(function(){
 			text += " / ";
 			text += soundShapes[i].lastPosition[0]; 
 			appendText(text);
+			*/
 
 		} // if positionChanged
 			
