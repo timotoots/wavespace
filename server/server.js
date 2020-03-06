@@ -31,23 +31,31 @@ console.log(conf.wavespace_server);
 
 var port = require('port');
 
+var pdFlags = {
+			'noprefs': true,
+			'stderr': true,
+			'nogui': conf.pdNoGui,
+			'send': 'pd dsp 0, dsp 1',
+			'inchannels':'8',
+			'outchannels':'16',
+			'open': './mixer.pd'
+
+		};
+
+if(conf.pdAudioApi){
+	pdFlags[conf.pdAudioApi] = true;
+}
+
+
+
+
 var pd = port({
 		'read': 8005,
 		'write': 8006,
 		'encoding': 'ascii',
 		'basepath': __dirname,
 		'pd':conf.pdBin,
-		'flags': {
-			'noprefs': true,
-			'stderr': true,
-			'nogui':conf.pdNoGui,
-			'send': 'pd dsp 0, dsp 1',
-			'inchannels':'4',
-			'outchannels':'16',
-			'audioindev':'2',
-			'open': './mixer.pd'
-
-		}
+		'flags': pdFlags
 })
 
 .on('connect', function(){
@@ -154,6 +162,12 @@ if(conf.launchChrome){
 
 }
 
+if(conf.launchFirefox){
+
+	var open = require("open");
+	open(conf.wavespace_server, "firefox");
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 // Testing

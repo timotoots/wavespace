@@ -10,6 +10,9 @@ conf.pdBin = '/bin/pd';
 conf.launchChrome = false;
 conf.pdNoGui = false;
 
+conf.pdAudioApi = "jack"
+conf.pdaudioindev = "";
+conf.launchFirefox = true;
 
 /////////////////////////////////////
 

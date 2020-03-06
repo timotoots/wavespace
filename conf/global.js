@@ -41,6 +41,26 @@ conf.players = [
 		"r":255,
 		"g":255,
 		"b":0
+	},
+		{
+		"r":255,
+		"g":0,
+		"b":0
+	},
+	{
+		"r":125,
+		"g":0,
+		"b":255
+	},
+	{
+		"r":0,
+		"g":255,
+		"b":190
+	},
+	{
+		"r":255,
+		"g":255,
+		"b":0
 	}
 ]
 
@@ -80,6 +100,7 @@ conf.pdBin = '/Applications/Pd-0.50-0.app/Contents/Resources/bin/pd';
 conf.launchChrome = false;
 conf.pdNoGui = false;
 
+conf.pdAudioApi = "pa";
 
 /////////////////////////////////////
 
