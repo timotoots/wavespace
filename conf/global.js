@@ -19,7 +19,7 @@ conf.spacesize_h = 400;
 /////////////////////////////////////
 // Sound players / Sound shapes
 
-conf.maxPlayers = 4;
+conf.maxPlayers = 8;
 
 conf.players = [
 	{

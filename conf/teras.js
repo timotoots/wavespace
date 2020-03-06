@@ -7,8 +7,8 @@ var conf = require(__dirname+'/global.js');
 conf = conf.getConf();
 
 conf.pdBin = '/bin/pd';
-conf.launchChrome = true;
-conf.pdNoGui = true;
+conf.launchChrome = false;
+conf.pdNoGui = false;
 
 
 /////////////////////////////////////
