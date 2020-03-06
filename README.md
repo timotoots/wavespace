@@ -1,8 +1,9 @@
 # Wavespace
 
-Simple, hackable, open-source spatial audio mixer.  
+Simple, hackable, open-source spatial audio and light mixer.  
 
 Not meant for public release, but feel free to use it however you want.  
+
 
 # Hardware:
 
@@ -60,3 +61,13 @@ Add a new configuration file as you hostname.js
 ```
 node server/server.js
 ```
+
+# Use cheap Wifi LED RGB Bulbs
+
+* Buy Teckin SB50 from Amazon
+
+* Use Tuya convert to flash Tasmota open source firmware to the bulb. Follow instructions here:
+
+https://github.com/ct-Open-Source/tuya-convert
+
+

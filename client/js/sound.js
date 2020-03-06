@@ -175,7 +175,7 @@ function createPlayer(i){
   div.insertAdjacentHTML('afterbegin','<div class="header">Player'+ i +'</div>');
 
   players[i].audioElement = document.createElement('audio');
-  players[i].audioElement.src = 'data/'+i+'.wav';
+  players[i].audioElement.src = 'data/speaker_test_aki/'+i+'.mp3';
   players[i].audioElement.id = "audioElement"+i
   players[i].audioElement.crossOrigin = 'anonymous';
   players[i].audioElement.autoplay = true;
