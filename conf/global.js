@@ -14,7 +14,7 @@ conf.dimensions.z = 400;
 
 conf.spacesize_x = 2100;
 conf.spacesize_y = 1400;
-conf.spacesize_h = 400;
+conf.spacesize_z = 400;
 
 /////////////////////////////////////
 // Sound players / Sound shapes

@@ -20,6 +20,10 @@ Not meant for public release, but feel free to use it however you want.
 * Node JS and NPM
 * Chromium, Google Chrome or Firefox  
 
+# Sound flow in Mac OS X:
+
+firefox
+
 # Get it running
 
 * Install Pure Data (vanilla)

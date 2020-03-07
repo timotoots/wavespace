@@ -2,12 +2,12 @@
 
 var players = [];
 
-function mapValues(value,in_min, in_max, out_min, out_max, rounded = false) {
+function mapValues(value,in_min, in_max, out_min, out_max, rounded = false, decimal=3) {
     var val = (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     if(rounded==true){
         return Math.round(val);
     } else {
-        val = toFixedNumber(val,3);
+        val = toFixedNumber(val,decimal);
         return val;
 
     }
@@ -24,4 +24,8 @@ function degrees_to_radians(degrees)
 {
   var pi = Math.PI;
   return degrees * (pi/180);
+}
+
+function mod(number,n){
+  return ((number%n)+n)%n;
 }

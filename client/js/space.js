@@ -15,10 +15,19 @@ var arrowList = [];
 var directionList = [];
 
 var box = new THREE.Box3();
+var line = new THREE.Line();
+
 var wall;
 
 var soundShapes = [];
+var soundOrbits = [];
 var speakers = [];
+
+var tempLine = new THREE.Line();
+
+var worldPosition;
+
+var lastTime = 0;
 
 init();
 animate();
@@ -26,7 +35,7 @@ animate();
 function createSoundshape(id){
 
 	var wallGeometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
-	var wallMaterial = new THREE.MeshBasicMaterial( {color: 0x8888ff} );
+	var wallMaterial = new THREE.MeshBasicMaterial( {color: 0x8888ff,wireframe:true,transparent: true, opacity: 0.25} );
 
 
 
@@ -44,6 +53,66 @@ function createSoundshape(id){
 
 	soundShapes[id].geometry.computeBoundingBox();
 	scene.add(soundShapes[id]);
+
+	// Create orbit
+
+	soundOrbits[id] = {};
+
+	changeOrbit(id,"ellipse");
+
+	// soundOrbits[id].morphedCurve = soundOrbits[id].originalCurve;
+	// soundOrbits[id].scale = {"x":1,"y":1,"z":1};
+	// soundOrbits[id].position = {"x":0,"y":0,"z":0};
+
+	// create line from original curve
+	// var points = soundOrbits[id].originalCurve.getPoints( 50 );
+	// var geometry = new THREE.BufferGeometry().setFromPoints( points );
+	// var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+	// soundOrbits[id].visibleLine = new THREE.Line( geometry, material );
+
+	scene.add(soundOrbits[id].line);
+
+
+}
+
+function changeOrbit(id, type){
+
+
+	if(type=="ellipse"){
+
+		var curve = new THREE.EllipseCurve(
+			0,  0,            // ax, aY
+			1000, 1000,           // xRadius, yRadius
+			0,  2 * Math.PI,  // aStartAngle, aEndAngle
+			false,            // aClockwise
+			0                 // aRotation
+		);
+
+	}
+
+
+	// create line from original curve
+	var points = curve.getPoints( 50 );
+	var geometry = new THREE.BufferGeometry().setFromPoints( points );
+	var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+	material.color = soundShapes[id].material.color;
+	var line = new THREE.Line( geometry, material );
+
+	soundOrbits[id].line = line;
+	soundOrbits[id].points = points;
+	soundOrbits[id].changed = true;
+
+	soundOrbits[id].lastPosAt = 0;
+	soundOrbits[id].speed = 0;
+
+
+	calculateNewOrbitCurve(id);
+
+	// for (var i = 0; i < points.length; i = i+3) {
+	// 	soundOrbits[id].points.push(new THREE.Vector3( points[i],points[i+1], points[i+2] ));
+	// }
+
+
 
 }
 
@@ -159,7 +228,7 @@ function init()
 	////////////
 	
 	// https://threejs.org/examples/#webgl_geometry_extrude_splines
-
+	/*
 	 curve = new THREE.EllipseCurve(
 		0,  0,            // ax, aY
 		1000, 1000,           // xRadius, yRadius
@@ -179,7 +248,7 @@ function init()
 
 	scene.add(ellipse);
 
-
+*/
 
 	////////////
 	// CUSTOM //
@@ -269,26 +338,110 @@ function calculateSoundDistances(sound_id){
 
 }
 
+
+
 function update(){
 
+	var delta = clock.getDelta(); // seconds.
 
-	var time = Date.now();
-	var looptime = 20 * 1000;
-	var t = ( time % looptime ) / looptime;
 
-	var pos = curve.getPointAt( t );
-	MovingCube.position.x = pos.x;
-	MovingCube.position.y = 0;
-	MovingCube.position.z = pos.y;
+	
 
-	soundShapes[1].position.x = pos.x;
-	soundShapes[1].position.y = 0;
-	soundShapes[1].position.z = pos.y;
+/*
+		// consol	e.log(soundOrbits[i].line);
+		// ifiewo();
+	// apply scale, position
+
+	 // line.position.x = soundOrbits[i].position.x;
+	 // line.position.y = soundOrbits[i].position.y;
+	 // line.position.z = soundOrbits[i].position.z;
+
+	 // line.scale.x = soundOrbits[i].scale.x;
+	 // line.scale.y = soundOrbits[i].scale.y;
+	 // line.scale.z = soundOrbits[i].scale.z;
+
+	// create morphedCurve from points
+	// line.applyMatrix3( line.matrixWorld );
+	
+	//line.copy( soundOrbits[i].line ).applyMatrix4( shape.matrixWorld );
+
+	// soundOrbits[i].visibleLine = line.clone();
+	//soundOrbits[i].visibleLine.geometry.dispose();
+	//soundOrbits[i].visibleLine.geometry = line.geometry.clone();
+
+	//soundOrbits[i].visibleLine.position
+
+	// draw line
+
+
+	var points = soundOrbits[id].curve.getPoints( 50 );
+	var geometry = new THREE.BufferGeometry().setFromPoints( points );
+	var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+	material.color = soundShapes[id].material.color;
+
+	soundOrbits[id].line = new THREE.Line( geometry, material );
+	soundOrbits[id].line.rotation.set(degrees_to_radians(90), 0, 0);
+
+	scene.add(soundOrbits[id].line);
+
+
+
+		var pos = soundOrbits[i].curve.getPointAt(t);
+		soundShapes[i].position.x = pos.x;
+		soundShapes[i].position.y = 0;
+		soundShapes[i].position.z = pos.y;
+*/
+
+		/*
+		// Draw curve to line
+		var points = soundOrbits[id].curve.getPoints( 50 );
+		var geometry = new THREE.BufferGeometry().setFromPoints( points );
+		var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+		material.color = soundShapes[id].material.color;
+
+		soundOrbits[id].line = new THREE.Line( geometry, material );
+		soundOrbits[id].line.rotation.set(degrees_to_radians(90), 0, 0);
+		*/
+
+		for (var id = 0; id < soundOrbits.length; id++) {
+			if(soundOrbits[id].changed){
+				calculateNewOrbitCurve(id)
+			}
+
+
+			var t = soundOrbits[id].lastPosAt + 0.01 * soundOrbits[id].speed * delta;
+			if(t < 0){
+				t = 1; // - Math.abs(t);
+			} else if(t > 1){
+				t = 0;
+			}
+			
+			soundOrbits[id].lastPosAt = t
+
+			var pos = soundOrbits[id].alteredCurve.getPointAt(t);
+			soundShapes[id].position.x = pos.x;
+			soundShapes[id].position.z = pos.z;
+			soundShapes[id].position.y = pos.y;
+
+		}
+
+
+
+		
+
+
+	
+	// MovingCube.position.x = pos.x;
+	// MovingCube.position.y = 0;
+	// MovingCube.position.z = pos.y;
+
+	// soundShapes[1].position.x = pos.x;
+	// soundShapes[1].position.y = 0;
+	// soundShapes[1].position.z = pos.y;
 
 
 	resizeCanvasToDisplaySize();
 
-	var delta = clock.getDelta(); // seconds.
 	var moveDistance = 200 * delta; // 200 pixels per second
 	var rotateAngle = Math.PI / 2 * delta;   // pi/2 radians (90 degrees) per second
 	
@@ -347,6 +500,80 @@ function update(){
 function render() 
 {
 	renderer.render( scene, camera );
+}
+
+function calculateNewOrbitCurve(id){
+
+
+		// Get original curve points
+		var points = soundOrbits[id].line.geometry.getAttribute("position").array;
+		var curvePoints = [];
+		for (var i = 0; i < points.length; i = i+3) {
+			curvePoints.push(new THREE.Vector3( points[i],points[i+1], points[i+2] ));
+		}
+
+		// Apply scale, positition, rotation
+		for (var i = 0; i < curvePoints.length; i++) {
+			curvePoints[i].applyMatrix4(soundOrbits[id].line.matrix);
+		}
+
+		// Create altered curve and calculate shape position
+		soundOrbits[id].alteredCurve = new THREE.CatmullRomCurve3(curvePoints);
+		// var curve = new THREE.CatmullRomCurve3(curvePoints);
+
+		soundOrbits[id].changed = false;
+
+
+}
+
+function spaceChangeSoundShape(i,param,value){
+
+	if(param=="position_x"){
+    	// soundShapes[i].position.x = mapValues(value,0,1,0,conf.dimensions.x);
+    	soundOrbits[i].line.position.x =  mapValues(value,0,1,0,conf.dimensions.x);
+    	soundOrbits[i].changed = true;
+
+	} else if(param=="position_y"){
+    	// soundShapes[i].position.z = mapValues(value,0,1,0,conf.dimensions.y);
+    	soundOrbits[i].line.position.z =  mapValues(value,0,1,0,conf.dimensions.y);
+    	soundOrbits[i].changed = true;
+
+	} else if(param=="position_z"){
+    	// soundShapes[i].position.y = mapValues(value,0,1,0,conf.dimensions.z);
+    	soundOrbits[i].line.position.y =  mapValues(value,0,1,0,conf.dimensions.z);
+    	soundOrbits[i].changed = true;
+
+	} else if(param=="scale_x"){
+    	soundShapes[i].scale.x = mapValues(value,0,1,0.0001,5, false,4);
+
+	} else if(param=="scale_y"){
+    	soundShapes[i].scale.z = mapValues(value,0,1,0.0001,5, false,4);
+
+	} else if(param=="scale_z"){
+    	soundShapes[i].scale.y = mapValues(value,0,1,0.0001,5, false,4);
+
+	} else if(param=="orbit_x"){
+		soundOrbits[i].line.scale.x = mapValues(value,0,1,0.0001,5, false,4);
+		soundOrbits[i].changed = true;
+    	// soundOrbits[i].line.scale.x = mapValues(value,0,1,0,5);
+
+	} else if(param=="orbit_y"){
+		soundOrbits[i].line.scale.y = mapValues(value,0,1,0.0001,5, false,4);
+		soundOrbits[i].changed = true;
+
+	} else if(param=="orbit_z"){
+		soundOrbits[i].line.rotation.x = mapValues(value,0,1,0,degrees_to_radians(360),false,5);
+		soundOrbits[i].changed = true;
+	} else if(param=="orbit_speed"){
+		// soundOrbits[i].looptime = mapValues(value,0,1,-20 * 1000,20 * 1000);
+		soundOrbits[i].speed = mapValues(value,0,1,-20,20);
+
+
+	}
+
+
+
+
 }
 
 setInterval(function(){

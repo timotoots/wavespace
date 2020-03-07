@@ -238,8 +238,11 @@ function createPlayer(i){
 
   position.on('change',function(v) {
 
-    soundShapes[i].position.x = mapValues(v.x,0,1,0,conf.dimensions.x);
-    soundShapes[i].position.z = mapValues(v.y,0,1,0,conf.dimensions.y);
+    spaceChangeSoundShape(i,"position_x",v.x);
+    spaceChangeSoundShape(i,"position_y",v.y);
+
+    // soundShapes[i].position.x = mapValues(v.x,0,1,0,conf.dimensions.x);
+    // soundShapes[i].position.z = mapValues(v.y,0,1,0,conf.dimensions.y);
   
 
     // MovingCube.position.x = mapValues(v.x,0,1,0,conf.spacesize_x);
@@ -252,20 +255,151 @@ function createPlayer(i){
   // UI Element: VSlider
 
   var slider =  Nexus.Add.Slider('#player'+i,{
-  'size': [20,120],
-  'mode': 'absolute',  // "absolute" or "relative"
-  'min': 0,
-   'max': 1,
+    'size': [20,120],
+    'mode': 'absolute',  // "absolute" or "relative"
+    'min': 0,
+    'max': 1,
     'step': 0,
-    'value': 0
-});
+    'value': 0,
+  });
 
   slider.on('change',function(v) {
 
-    MovingCube.position.y = mapValues(v,0,1,0,conf.dimensions.z);
+    spaceChangeSoundShape(i,"position_z",v);
 
     //console.log(v);
   })
+
+
+  //////////////////////
+  // UI Element: Dial Scale X
+
+  var dial_scale_x =  Nexus.Add.Dial('#player'+i,{
+    'size': [40,40],
+    'interaction': 'vertical', // "radial", "vertical", or "horizontal"
+    'mode': 'relative', // "absolute" or "relative"
+    'min': 0,
+    'max': 1,
+    'step': 0,
+    'value': 0
+  });
+
+  dial_scale_x.on('change',function(v) {
+    spaceChangeSoundShape(i,"scale_x",v);
+  })
+
+  //////////////////////
+  // UI Element: Dial Scale Y
+
+  var dial_scale_y =  Nexus.Add.Dial('#player'+i,{
+    'size': [40,40],
+    'interaction': 'vertical', // "radial", "vertical", or "horizontal"
+    'mode': 'relative', // "absolute" or "relative"
+    'min': 0,
+    'max': 1,
+    'step': 0,
+    'value': 0
+  });
+
+  dial_scale_y.on('change',function(v) {
+    spaceChangeSoundShape(i,"scale_y",v);
+  })
+
+    //////////////////////
+  // UI Element: Dial Scale Z
+
+  var dial_scale_z =  Nexus.Add.Dial('#player'+i,{
+    'size': [40,40],
+    'interaction': 'vertical', // "radial", "vertical", or "horizontal"
+    'mode': 'relative', // "absolute" or "relative"
+    'min': 0,
+    'max': 1,
+    'step': 0,
+    'value': 0
+  });
+
+  dial_scale_z.on('change',function(v) {
+    spaceChangeSoundShape(i,"scale_z",v);
+  })
+
+
+
+
+
+
+
+  //////////////////////
+  // UI Element: Dial Orbit X
+
+  var dial_orbit_x =  Nexus.Add.Dial('#player'+i,{
+    'size': [40,40],
+    'interaction': 'vertical', // "radial", "vertical", or "horizontal"
+    'mode': 'relative', // "absolute" or "relative"
+    'min': 0,
+    'max': 1,
+    'step': 0,
+    'value': 0
+  });
+
+  dial_orbit_x.on('change',function(v) {
+    spaceChangeSoundShape(i,"orbit_x",v);
+  })
+
+  //////////////////////
+  // UI Element: Dial Orbit Y
+
+  var dial_orbit_y =  Nexus.Add.Dial('#player'+i,{
+    'size': [40,40],
+    'interaction': 'vertical', // "radial", "vertical", or "horizontal"
+    'mode': 'relative', // "absolute" or "relative"
+    'min': 0,
+    'max': 1,
+    'step': 0,
+    'value': 0
+  });
+
+  dial_orbit_y.on('change',function(v) {
+    spaceChangeSoundShape(i,"orbit_y",v);
+  })
+
+    //////////////////////
+  // UI Element: Dial Orbit Z
+
+  var dial_orbit_z =  Nexus.Add.Dial('#player'+i,{
+    'size': [40,40],
+    'interaction': 'vertical', // "radial", "vertical", or "horizontal"
+    'mode': 'relative', // "absolute" or "relative"
+    'min': 0,
+    'max': 1,
+    'step': 0,
+    'value': 0
+  });
+
+  dial_orbit_z.on('change',function(v) {
+    spaceChangeSoundShape(i,"orbit_z",v);
+  })
+
+
+    //////////////////////
+  // UI Element: Dial Orbit Speed
+
+  var dial_orbit_speed =  Nexus.Add.Dial('#player'+i,{
+    'size': [40,40],
+    'interaction': 'vertical', // "radial", "vertical", or "horizontal"
+    'mode': 'relative', // "absolute" or "relative"
+    'min': 0,
+    'max': 1,
+    'step': 0,
+    'value': 0.5
+  });
+
+  dial_orbit_speed.on('change',function(v) {
+    spaceChangeSoundShape(i,"orbit_speed",v);
+  })
+
+
+
+
 
 //////////////////////
 
