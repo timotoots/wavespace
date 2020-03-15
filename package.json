@@ -24,12 +24,14 @@
   "dependencies": {
     "bootstrap": "^4.4.1",
     "chrome-launcher": "^0.13.0",
+    "colors": "^1.4.0",
     "express": "^4.17.1",
     "http": "0.0.0",
     "jquery": "^3.4.1",
     "mqtt": "^3.0.0",
     "open": "^7.0.2",
     "port": "^0.8.1",
+    "serialport": "^8.0.7",
     "socket.io": "^2.3.0",
     "split-pane": "^0.5.1",
     "stats.js": "^0.17.0"

@@ -10,6 +10,8 @@
     document.getElementById("message").innerHTML = msg;
   });
 
+
+
 var players = [];
 
 ////////////////////////////////////////////////////////////////////////
@@ -154,6 +156,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
+/////////////////////////////////////////////////////////////////////////////////
+
+    socket.on('serial-mqtt', function(data){
+      topic = data.topic.split("/");
+      var controller = topic[1].replace("controller","");
+      //console.log(data.payload);
+
+      if(topic[3]=="POS_X"){
+          players[controller].position.x = mapValues(data.payload,0,255,0,1);
+      } else if(topic[3]=="POS_Y"){
+          players[controller].position.y = mapValues(data.payload,0,255,0,1);
+      } else if(topic[3]=="POS_Z"){
+          players[controller].slider_pos_z.value = mapValues(data.payload,0,255,0,1);
+      } else if(topic[3]=="ORBIT_WIDTH"){
+          players[controller].dial_orbit_x.value = mapValues(data.payload,0,255,0,1);
+      } else if(topic[3]=="ORBIT_LENGTH"){
+          players[controller].dial_orbit_y.value = mapValues(data.payload,0,255,0,1);
+      } else if(topic[3]=="ORBIT_ROTATE"){
+          players[controller].dial_orbit_z.value = mapValues(data.payload,0,255,0,1);
+      } else if(topic[3]=="ORBIT_SPEED"){
+          players[controller].dial_orbit_speed.value = mapValues(data.payload,0,255,0,1);
+      } else if(topic[3]=="SHAPE_WIDTH"){
+          players[controller].dial_scale_x.value = mapValues(data.payload,0,255,0,1);
+      } else if(topic[3]=="SHAPE_LENGTH"){
+          players[controller].dial_scale_y.value = mapValues(data.payload,0,255,0,1);
+      } else if(topic[3]=="SHAPE_HEIGHT"){
+          players[controller].dial_scale_z.value = mapValues(data.payload,0,255,0,1);
+      } else if(topic[3]=="SHAPE_BLUR"){
+
+      } else if(topic[3]=="VOLUME"){
+         players[controller].audioElement.volume = mapValues(data.payload,0,255,0,1);
+      }
+
+    });
 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -223,7 +259,7 @@ function createPlayer(i){
   //////////////////////
   // UI Element: Joystick
 
-  var position =  Nexus.Add.Position('#player'+i,{
+  players[i].position =  Nexus.Add.Position('#player'+i,{
   'size': [100,100],
   'mode': 'absolute',  // "absolute" or "relative"
   'x': 0.5,  // initial x value
@@ -236,7 +272,7 @@ function createPlayer(i){
   'stepY': 0
 });
 
-  position.on('change',function(v) {
+  players[i].position.on('change',function(v) {
 
     spaceChangeSoundShape(i,"position_x",v.x);
     spaceChangeSoundShape(i,"position_y",v.y);
@@ -251,10 +287,12 @@ function createPlayer(i){
     //console.log(v);
   })
 
+
+
   //////////////////////
   // UI Element: VSlider
 
-  var slider =  Nexus.Add.Slider('#player'+i,{
+  players[i].slider_pos_z =  Nexus.Add.Slider('#player'+i,{
     'size': [20,120],
     'mode': 'absolute',  // "absolute" or "relative"
     'min': 0,
@@ -263,7 +301,7 @@ function createPlayer(i){
     'value': 0,
   });
 
-  slider.on('change',function(v) {
+  players[i].slider_pos_z.on('change',function(v) {
 
     spaceChangeSoundShape(i,"position_z",v);
 
@@ -274,7 +312,7 @@ function createPlayer(i){
   //////////////////////
   // UI Element: Dial Scale X
 
-  var dial_scale_x =  Nexus.Add.Dial('#player'+i,{
+  players[i].dial_scale_x =  Nexus.Add.Dial('#player'+i,{
     'size': [40,40],
     'interaction': 'vertical', // "radial", "vertical", or "horizontal"
     'mode': 'relative', // "absolute" or "relative"
@@ -284,14 +322,14 @@ function createPlayer(i){
     'value': 0
   });
 
-  dial_scale_x.on('change',function(v) {
+  players[i].dial_scale_x.on('change',function(v) {
     spaceChangeSoundShape(i,"scale_x",v);
   })
 
   //////////////////////
   // UI Element: Dial Scale Y
 
-  var dial_scale_y =  Nexus.Add.Dial('#player'+i,{
+  players[i].dial_scale_y =  Nexus.Add.Dial('#player'+i,{
     'size': [40,40],
     'interaction': 'vertical', // "radial", "vertical", or "horizontal"
     'mode': 'relative', // "absolute" or "relative"
@@ -301,14 +339,14 @@ function createPlayer(i){
     'value': 0
   });
 
-  dial_scale_y.on('change',function(v) {
+  players[i].dial_scale_y.on('change',function(v) {
     spaceChangeSoundShape(i,"scale_y",v);
   })
 
     //////////////////////
   // UI Element: Dial Scale Z
 
-  var dial_scale_z =  Nexus.Add.Dial('#player'+i,{
+  players[i].dial_scale_z =  Nexus.Add.Dial('#player'+i,{
     'size': [40,40],
     'interaction': 'vertical', // "radial", "vertical", or "horizontal"
     'mode': 'relative', // "absolute" or "relative"
@@ -318,7 +356,7 @@ function createPlayer(i){
     'value': 0
   });
 
-  dial_scale_z.on('change',function(v) {
+  players[i].dial_scale_z.on('change',function(v) {
     spaceChangeSoundShape(i,"scale_z",v);
   })
 
@@ -331,7 +369,7 @@ function createPlayer(i){
   //////////////////////
   // UI Element: Dial Orbit X
 
-  var dial_orbit_x =  Nexus.Add.Dial('#player'+i,{
+  players[i].dial_orbit_x =  Nexus.Add.Dial('#player'+i,{
     'size': [40,40],
     'interaction': 'vertical', // "radial", "vertical", or "horizontal"
     'mode': 'relative', // "absolute" or "relative"
@@ -341,14 +379,15 @@ function createPlayer(i){
     'value': 0
   });
 
-  dial_orbit_x.on('change',function(v) {
+
+  players[i].dial_orbit_x.on('change',function(v) {
     spaceChangeSoundShape(i,"orbit_x",v);
   })
 
   //////////////////////
   // UI Element: Dial Orbit Y
 
-  var dial_orbit_y =  Nexus.Add.Dial('#player'+i,{
+  players[i].dial_orbit_y =  Nexus.Add.Dial('#player'+i,{
     'size': [40,40],
     'interaction': 'vertical', // "radial", "vertical", or "horizontal"
     'mode': 'relative', // "absolute" or "relative"
@@ -358,14 +397,14 @@ function createPlayer(i){
     'value': 0
   });
 
-  dial_orbit_y.on('change',function(v) {
+  players[i].dial_orbit_y.on('change',function(v) {
     spaceChangeSoundShape(i,"orbit_y",v);
   })
 
     //////////////////////
   // UI Element: Dial Orbit Z
 
-  var dial_orbit_z =  Nexus.Add.Dial('#player'+i,{
+  players[i].dial_orbit_z =  Nexus.Add.Dial('#player'+i,{
     'size': [40,40],
     'interaction': 'vertical', // "radial", "vertical", or "horizontal"
     'mode': 'relative', // "absolute" or "relative"
@@ -375,7 +414,7 @@ function createPlayer(i){
     'value': 0
   });
 
-  dial_orbit_z.on('change',function(v) {
+  players[i].dial_orbit_z.on('change',function(v) {
     spaceChangeSoundShape(i,"orbit_z",v);
   })
 
@@ -383,7 +422,7 @@ function createPlayer(i){
     //////////////////////
   // UI Element: Dial Orbit Speed
 
-  var dial_orbit_speed =  Nexus.Add.Dial('#player'+i,{
+  players[i].dial_orbit_speed =  Nexus.Add.Dial('#player'+i,{
     'size': [40,40],
     'interaction': 'vertical', // "radial", "vertical", or "horizontal"
     'mode': 'relative', // "absolute" or "relative"
@@ -393,7 +432,7 @@ function createPlayer(i){
     'value': 0.5
   });
 
-  dial_orbit_speed.on('change',function(v) {
+  players[i].dial_orbit_speed.on('change',function(v) {
     spaceChangeSoundShape(i,"orbit_speed",v);
   })
 

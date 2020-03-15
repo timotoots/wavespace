@@ -13,7 +13,11 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http, { origins: '*:*'});
 var path = require('path');
 
+ var colors = require('colors');
+
+
 ////////////////////////////////////////////////////////////////////////
+
 
 var os = require("os");
 var hostname = os.hostname();
@@ -83,6 +87,63 @@ var pd = port({
 	// if (!!io) io.emit('message', data);
 })
 .create();
+
+////////////////////////////////////////////////////////////////////////
+
+
+var serialDevice = "/dev/tty.SLAB_USBtoUART";
+var SerialPort = require('serialport');
+const Readline = SerialPort.parsers.Readline;
+
+try{
+	var serialport = new SerialPort(serialDevice, {
+	  baudRate: 115200
+	});
+
+} catch(e){
+  console.log("No device connected to " + serialDevice);
+  process.exit();
+}
+
+var serialport_opened = false;
+
+serialport.on('open', function(){
+  console.log('Serial port1 opened'.green);
+  if(serialport_opened==true){
+  	//boot();
+  }
+  serialport_opened = true;
+});
+
+const parser = new Readline({delimiter: '\n'});
+serialport.pipe(parser);
+
+
+ parser.on('data', function(data){
+
+   // DEBUG
+
+   data = trim(data);
+   if(data.substr(0,11) == "/controller"){
+
+   	datas = data.split(":");
+   	var out = {};
+   	out["topic"] = trim(datas[0]);
+   	out["payload"] = trim(datas[1]);
+   	io.emit('serial-mqtt', out);
+   	console.log(out);
+   } else {
+   	console.log(data.red);
+   }
+
+   
+
+  // datas = data.split(":");
+
+  // var data_spaces = data.split(" ");
+   
+
+});
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -166,6 +227,13 @@ if(conf.launchFirefox){
 
 	var open = require("open");
 	open(conf.wavespace_server, "firefox");
+
+}
+
+function trim(str){
+
+  str = str.replace(/^\s+|\s+$/g,'');
+  return str;
 
 }
 
