@@ -2,7 +2,7 @@
 int currentState[5] = {-1,-1,-1,-1,-1};
 #include "esp_task_wdt.h"
 
-#define CONTROLLER_ID 3
+#define CONTROLLER_ID 4
 
 const int DEBUG_ENABLED = 1;
 #include "CommandLine.h"
@@ -17,7 +17,10 @@ int matrix_display = -1;
     
     Serial.begin(115200);
     Serial.println("START");
-    
+
+     Serial.print("DEVICE_ID: 1000");
+     Serial.println(CONTROLLER_ID);
+     
     setup_touch();
     setup_rgb();
     setup_pot();
@@ -52,7 +55,12 @@ bool parse_command(char * commandLine) {
 
   char * ptrToCommandName = strtok(commandLine, delimiters);
 
-  if (strcmp(ptrToCommandName, "led") == 0) {
+  if (strcmp(ptrToCommandName, "10000") == 0) {
+
+       Serial.print("DEVICE_ID: ");
+       Serial.println(10000 + CONTROLLER_ID);
+            
+  } else if (strcmp(ptrToCommandName, "led") == 0) {
      int led_id = readNumber();
      int led_red = readNumber();
      int led_green = readNumber();
