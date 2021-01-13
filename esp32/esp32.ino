@@ -2,7 +2,7 @@
 int currentState[5] = {-1,-1,-1,-1,-1};
 #include "esp_task_wdt.h"
 
-#define CONTROLLER_ID 1
+#define CONTROLLER_ID 3
 
 const int DEBUG_ENABLED = 1;
 #include "CommandLine.h"
@@ -18,7 +18,7 @@ int matrix_display = -1;
     Serial.begin(115200);
     Serial.println("START");
     
-   // setup_touch();
+    setup_touch();
     setup_rgb();
     setup_pot();
      setup_led_analog();
@@ -34,15 +34,15 @@ int matrix_display = -1;
   delay(500); 
 
   
-  xTaskCreatePinnedToCore(
-      Task2code,   /* Task function. */
-      "Task2",     /* name of task. */
-      10000,       /* Stack size of task */
-      NULL,        /* parameter of the task */
-      1,           /* priority of the task */
-      &Task2,      /* Task handle to keep track of created task */
-      1);          /* pin task to core 1 */
-    delay(500); 
+ // xTaskCreatePinnedToCore(
+ //     Task2code,   /* Task function. */
+//      "Task2",     /* name of task. */
+ //     10000,       /* Stack size of task */
+ //     NULL,        /* parameter of the task */
+ //     1,           /* priority of the task */
+ //     &Task2,      /* Task handle to keep track of created task */
+ //     1);          /* pin task to core 1 */
+ //   delay(500); 
 
 }
 

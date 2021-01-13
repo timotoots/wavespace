@@ -18,10 +18,13 @@ const int resolution = 8;
 
 void setup_led_analog(){
   // configure LED PWM functionalitites
-  ledcSetup(ledChannel, freq, resolution);
+  ledcSetup(0, freq, resolution);
+  ledcSetup(1, freq, resolution);
   
   // attach the channel to the GPIO to be controlled
-  ledcAttachPin(ledPin, ledChannel);
+  ledcAttachPin(2, 0); // mosfet 0
+  ledcAttachPin(21, 1); // mosfet 1
+
 }
 
 void change_mosfet(int i, int power){

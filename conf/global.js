@@ -99,8 +99,11 @@ conf.pdBin = '/Applications/Pd-0.50-0.app/Contents/Resources/bin/pd';
 
 conf.launchChrome = false;
 conf.pdNoGui = false;
+conf.launchPd = true;
 
 conf.pdAudioApi = "pa";
+
+conf.useSerial = true;
 
 /////////////////////////////////////
 

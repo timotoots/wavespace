@@ -193,6 +193,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /////////////////////////////////////////////////////////////////////////////////
 
+function setDefaults(){
+
+  var controller = 0;
+
+ players[controller].position.x = 0.31
+ players[controller].position.y =  0.35
+players[controller].dial_orbit_x.value =  0.12
+players[controller].dial_orbit_y.value = 0.12
+players[controller].dial_orbit_z.value  = 0.25
+players[controller].dial_orbit_speed.value = 0.52
+players[controller].dial_scale_x.value =  0.005
+players[controller].dial_scale_y.value =  0.005
+players[controller].dial_scale_z.value = 0.005
+
+
+
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+
 function createPlayer(i){
 
 
@@ -231,7 +251,10 @@ function createPlayer(i){
 
    setTimeout(function(  ){
     players[i].audioElement.pause();
+     setDefaults();
   },1000);
+
+
 
   ////////////////////////
   // UI Element: 2D Panner

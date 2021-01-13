@@ -33,117 +33,126 @@ console.log(conf.wavespace_server);
 
 // Start Pd
 
-var port = require('port');
 
-var pdFlags = {
-			'noprefs': true,
-			'stderr': true,
-			'nogui': conf.pdNoGui,
-			'send': 'pd dsp 0, dsp 1',
-			'inchannels':'8',
-			'outchannels':'16',
-			'open': './mixer.pd'
+if(conf.launchPd == true){
 
-		};
+	var port = require('port');
 
-if(conf.pdAudioApi){
-	pdFlags[conf.pdAudioApi] = true;
-}
+	var pdFlags = {
+				'noprefs': true,
+				'stderr': true,
+				'nogui': conf.pdNoGui,
+				'send': 'pd dsp 0, dsp 1',
+				'inchannels':'8',
+				'outchannels':'16',
+				'open': './mixer.pd'
 
+			};
 
-
-
-var pd = port({
-		'read': 8005,
-		'write': 8006,
-		'encoding': 'ascii',
-		'basepath': __dirname,
-		'pd':conf.pdBin,
-		'flags': pdFlags
-})
-
-.on('connect', function(){
-	this.write('run 1;\n');
-	this.write('Pd started;\n');
-
-})
-
-.on('stderr', function(buffer){
-	console.log(buffer.toString());
-})
-
-.on('data', function(data){
-
-	console.log(data);
-	
-	io.emit('pdmessage', data);
-	var i, l;
-	data = data.slice(0, -2).split(' ');
-	l = data.length;
-	for (i = 0; i < l; i += 1){
-		data[i] = +data[i];
+	if(conf.pdAudioApi){
+		pdFlags[conf.pdAudioApi] = true;
 	}
-	
-	// if (!!io) io.emit('message', data);
-})
-.create();
+
+
+
+
+	var pd = port({
+			'read': 8005,
+			'write': 8006,
+			'encoding': 'ascii',
+			'basepath': __dirname,
+			'pd':conf.pdBin,
+			'flags': pdFlags
+	})
+
+	.on('connect', function(){
+		this.write('run 1;\n');
+		this.write('Pd started;\n');
+
+	})
+
+	.on('stderr', function(buffer){
+		console.log(buffer.toString());
+	})
+
+	.on('data', function(data){
+
+		console.log(data);
+		
+		io.emit('pdmessage', data);
+		var i, l;
+		data = data.slice(0, -2).split(' ');
+		l = data.length;
+		for (i = 0; i < l; i += 1){
+			data[i] = +data[i];
+		}
+		
+		// if (!!io) io.emit('message', data);
+	})
+	.create();
+
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 
+if(conf.useSerial == true){
 
-var serialDevice = "/dev/tty.SLAB_USBtoUART";
-var SerialPort = require('serialport');
-const Readline = SerialPort.parsers.Readline;
+	var serialDevice = "/dev/tty.SLAB_USBtoUART";
+	var SerialPort = require('serialport');
+	const Readline = SerialPort.parsers.Readline;
 
-try{
-	var serialport = new SerialPort(serialDevice, {
-	  baudRate: 115200
+	try{
+		var serialport = new SerialPort(serialDevice, {
+		  baudRate: 115200
+		});
+
+	} catch(e){
+	  console.log("No device connected to " + serialDevice);
+	  process.exit();
+	}
+
+	var serialport_opened = false;
+
+	serialport.on('open', function(){
+	  console.log('Serial port1 opened'.green);
+	  if(serialport_opened==true){
+	  	//boot();
+	  }
+	  serialport_opened = true;
 	});
 
-} catch(e){
-  console.log("No device connected to " + serialDevice);
-  process.exit();
-}
-
-var serialport_opened = false;
-
-serialport.on('open', function(){
-  console.log('Serial port1 opened'.green);
-  if(serialport_opened==true){
-  	//boot();
-  }
-  serialport_opened = true;
-});
-
-const parser = new Readline({delimiter: '\n'});
-serialport.pipe(parser);
+	const parser = new Readline({delimiter: '\n'});
+	serialport.pipe(parser);
 
 
- parser.on('data', function(data){
+	 parser.on('data', function(data){
 
-   // DEBUG
+	   // DEBUG
 
-   data = trim(data);
-   if(data.substr(0,11) == "/controller"){
+	   data = trim(data);
+	   if(data.substr(0,11) == "/controller"){
 
-   	datas = data.split(":");
-   	var out = {};
-   	out["topic"] = trim(datas[0]);
-   	out["payload"] = trim(datas[1]);
-   	io.emit('serial-mqtt', out);
-   	console.log(out);
-   } else {
-   	console.log(data.red);
-   }
+	   	datas = data.split(":");
+	   	var out = {};
+	   	out["topic"] = trim(datas[0]);
+	   	out["payload"] = trim(datas[1]);
+	   	io.emit('serial-mqtt', out);
+	   	console.log(out);
+	   } else {
+	   	console.log(data.red);
+	   }
 
-   
+	   
 
-  // datas = data.split(":");
+	  // datas = data.split(":");
 
-  // var data_spaces = data.split(" ");
-   
+	  // var data_spaces = data.split(" ");
+	   
 
-});
+	});
+
+} // use serial 
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -181,9 +190,14 @@ io.on('connection', function(socket){
 	socket.on('message', function(data){
 
 	console.log("Data from browser: " + data);
-	if(pd.isRunning()){
-		console.log("Send to Pd: "+data);
-		pd.write(data+';\n');
+
+	if(conf.launchPd){
+
+
+		if(pd.isRunning()){
+			console.log("Send to Pd: "+data);
+			pd.write(data+';\n');
+		}
 	}
 
 	});

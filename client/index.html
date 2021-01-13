@@ -15,12 +15,12 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
 		<!-- Space Scripts-->
-		<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js'></script>
-		<script src="/node_modules/stats.js/build/stats.min.js"></script>
-		<script src="lib/OrbitControls.js"></script>
-		<script src="lib/THREEx.KeyboardState.js"></script>
+		<!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js'></script> -->
+		<!-- <script src="/node_modules/stats.js/build/stats.min.js"></script> -->
+		<!-- <script src="lib/OrbitControls.js"></script> -->
+<!-- 		<script src="lib/THREEx.KeyboardState.js"></script>
 		<script src="lib/THREEx.FullScreen.js"></script>
-		<script src="lib/THREEx.WindowResize.js"></script>
+		<script src="lib/THREEx.WindowResize.js"></script> -->
 
 		<!-- Sound Scripts -->
 		  <script src="/socket.io/socket.io.js"></script>
@@ -82,11 +82,11 @@
 	position: absolute;
 	top: 0;
 	left: 0;
-	width: 100vw;
+	width: 1920px;
 	z-index: 9;
 
 		/* Initially we don't want any height, and we want the contents to be hidden */
-	height: 50vh;
+	height: 1080px;
 	overflow: hidden;
 
 	/* Set our transitions up. 
@@ -135,7 +135,9 @@ audio{
 	 transform: scale(0.7);
 
 }
-
+[nexus-ui]{
+	float: left;
+}
 
 		</style>
 
@@ -170,7 +172,7 @@ audio{
 		<script type="text/javascript" src="js/functions.js"></script>
 		<script type="text/javascript" src="/conf.js"></script>
 		<script type="text/javascript" src="js/mqtt.js"></script>
-		<script type="text/javascript" src="js/space.js"></script>
+		<script  src="js/space.js"  type="module"></script>
 		<script type="text/javascript" src="js/sound.js"></script>
 		<script type="text/javascript">
 			var toggleBtn = document.querySelector('.sidebar-toggle');
@@ -185,6 +187,14 @@ audio{
 
 			})
 
+
+		$(document).keyup(function(e) {
+		     if (e.keyCode == 27) { // escape key maps to keycode `27`
+		       toggleBtn.classList.toggle('is-closed');
+			  sidebar.classList.toggle('is-closed');
+			  threediv.classList.toggle('is-closed');
+		    }
+		});
 
 
 
