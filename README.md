@@ -26,11 +26,11 @@ firefox
 
 # Get it running
 
-* Install Pure Data (vanilla)
-https://puredata.info/downloads/pure-data
-```
-sudo apt install puredata
-```
+* Install Ubuntu Studio with:
+
+	* pure data 
+	* jack
+
 
 * Install Chromium
 ```
