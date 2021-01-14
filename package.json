@@ -22,7 +22,6 @@
   },
   "homepage": "https://github.com/timotoots/wavespace#readme",
   "dependencies": {
-    "bootstrap": "^4.4.1",
     "chrome-launcher": "^0.13.0",
     "colors": "^1.4.0",
     "express": "^4.17.1",
@@ -32,8 +31,6 @@
     "open": "^7.0.2",
     "port": "^0.8.1",
     "serialport": "^8.0.7",
-    "socket.io": "^2.3.0",
-    "split-pane": "^0.5.1",
     "stats.js": "^0.17.0",
     "three": "^0.115.0",
     "tween.js": "^16.6.0"

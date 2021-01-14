@@ -6,31 +6,97 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+var colors = require('colors');
 
 
-var express = require('express');
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http, { origins: '*:*'});
-var path = require('path');
+var mqtt_prepend = "wavespace";
+var mqtt_server = "192.168.1.59";
+var mqtt_user = ""
+var mqtt_pass = ""
 
- var colors = require('colors');
+var conf = {}
+conf.launchPd = true;
+conf.pdNoGui = false;
+conf.pdAudioApi = "pajack"
+conf.pdBin = "";
+
+console.log("Started");
+
+
+////////////////////////////////////////////////////////////////////////
+
+var mqtt = require('mqtt')
+var client  = mqtt.connect('mqtt://'+mqtt_server,{"username":mqtt_user,"password":mqtt_pass})
+
+client.on('connect', function () {
+
+  client.subscribe('wavespace/speaker_gains/#', function (err) {
+    if (!err) {
+      client.publish('wavespace/mixer', 'mixer started')
+      console.log("subscribed");
+    }
+  }) 
+})
+
+client.on('message', function (topic, message) {
+	parseMqtt(topic, message.toString());
+})
+
+
+function sendMqtt(topic, value){
+
+	topic = mqtt_prepend + topic;
+
+	console.log("[MQTT] Send to topic " + topic.green + ", value: '" + value + "'")
+
+    client.publish(topic, value)
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+function parseMqtt(topic, message){
+
+	
+  topic = topic.split("/");
+
+  if(topic[1]=="speaker_gains" && topic[2]){
+
+		if(conf.launchPd){
+
+				if(pd.isRunning()){
+					console.log("Send to Pd: "+message);
+					pd.write(message+';\n');
+				}
+			}
+			console.log(message)
+
+  }
+
+
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+// var express = require('express');
+// var app = express();
+// var http = require('http').Server(app);
+// var path = require('path');
+
+
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-var os = require("os");
-var hostname = os.hostname();
+// var os = require("os");
+// var hostname = os.hostname();
 
-hostname = hostname.replace('.local', '');
+// hostname = hostname.replace('.local', '');
 
-var conf = require('../conf/'+hostname+".js");
-conf = conf.getConf();
-
-conf.wavespace_server = 'http://'+hostname +".local:"+ conf.wavespace_port;
-
-console.log(conf.wavespace_server);
 
 // Start Pd
 
@@ -79,16 +145,17 @@ if(conf.launchPd == true){
 	.on('data', function(data){
 
 		console.log(data);
+
+		sendMqtt("/pd", data)
 		
-		io.emit('pdmessage', data);
-		var i, l;
-		data = data.slice(0, -2).split(' ');
-		l = data.length;
-		for (i = 0; i < l; i += 1){
-			data[i] = +data[i];
-		}
+		// io.emit('pdmessage', data);
+		// var i, l;
+		// data = data.slice(0, -2).split(' ');
+		// l = data.length;
+		// for (i = 0; i < l; i += 1){
+		// 	data[i] = +data[i];
+		// }
 		
-		// if (!!io) io.emit('message', data);
 	})
 	.create();
 
@@ -100,91 +167,23 @@ if(conf.launchPd == true){
 ////////////////////////////////////////////////////////////////////////
 // Serve static files
 
-app.use(express.static(path.join(__dirname, '../client'))); //  "public" off of current is root
-app.use('/node_modules', express.static(path.join(__dirname, '../node_modules')));
-app.use('/data', express.static(path.join(__dirname, '../data')));
+// app.use(express.static(path.join(__dirname, '../client'))); //  "public" off of current is root
+// app.use('/node_modules', express.static(path.join(__dirname, '../node_modules')));
+// app.use('/data', express.static(path.join(__dirname, '../data')));
 
-// Config for the client
-app.get('/conf.js', function(req, res){
+// // Config for the client
+// app.get('/conf.js', function(req, res){
 
-    res.setHeader('Content-Type', 'application/javascript');
-    res.end('var conf=' + JSON.stringify(conf));
+//     res.setHeader('Content-Type', 'application/javascript');
+//     res.end('var conf=' + JSON.stringify(conf));
 
-});
+// });
 
 
 
-////////////////////////////////////////////////////////////////////////
-// Socket connection
 
-http.listen(conf.wavespace_port, function(){
-
-  console.log('listening on *:'+conf.wavespace_port);
-
-});
 
 ////////////////////////////////////////////////////////////////////////
-//
-
-io.on('connection', function(socket){
-
-
-	socket.on('message', function(data){
-
-	console.log("Data from browser: " + data);
-
-	if(conf.launchPd){
-
-
-		if(pd.isRunning()){
-			console.log("Send to Pd: "+data);
-			pd.write(data+';\n');
-		}
-	}
-
-	});
-
-
-	// socket.on('disconnect', function(){
-	// 	pd.destroy();
-	// });
-
-
-});
-////////////////////////////////////////////////////////////////////////
-
-if(conf.launchChrome){
-
-	const chromeLauncher = require('chrome-launcher');
-
-	const newFlags = chromeLauncher.Launcher.defaultFlags().filter(flag => flag !== '--mute-audio');
-
-	newFlags.push("--kiosk");
-
-	console.log(newFlags);
-	/*
-	chromeLauncher.launch({
-	  startingUrl: 'https://google.com'
-	}).then(chrome => {
-	  console.log(`Chrome debugging port running on ${chrome.port}`);
-	});
-	*/
-	chromeLauncher.launch({
-	  ignoreDefaultFlags: true,
-	  chromeFlags: newFlags,
-	  startingUrl: conf.wavespace_server
-	}).then(chrome => {
-	  console.log(`Chrome debugging port running on ${chrome.port}`);
-	});
-
-}
-
-if(conf.launchFirefox){
-
-	var open = require("open");
-	open(conf.wavespace_server, "firefox");
-
-}
 
 function trim(str){
 
@@ -193,17 +192,4 @@ function trim(str){
 
 }
 
-////////////////////////////////////////////////////////////////////////
-// Testing
-  /*
-setInterval( function() {
-
-
-
-  var msg = Math.random();
-  io.emit('message', msg);
- // console.log (msg);
-
-}, 1000);
-  */
 

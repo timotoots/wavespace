@@ -8,11 +8,11 @@
 // configuration
 
 var serial_ports = [
-	"/dev/tty.SLAB_USBtoUART",
-	"/dev/tty.SLAB_USBtoUART71",
-	"/dev/tty.SLAB_USBtoUART72",
-	"/dev/tty.SLAB_USBtoUART64",
-	"/dev/tty.SLAB_USBtoUART90"
+	"/dev/ttyUSB0",
+	"/dev/ttyUSB1",
+	"/dev/ttyUSB2",
+	"/dev/ttyUSB3",
+	"/dev/ttyUSB4"
 	]
 
 var mqtt_prepend = "wavespace";
@@ -108,6 +108,8 @@ function globalSerialParser(data, parser_id){
             console.log("[SERIAL] Register new device.".green + " DEVICE_ID: " + id + " to PORT_ID " + parser_id + " " + serial_ports[parser_id]);
             portMapping[id] = parser_id;
             ports[parser_id].deviceId = id;
+            ports[parser_id].port.write("publish_all\n"); // ask to idetify
+
         } else {
             console.log("[SERIAL] No device id at port: " + parser_id + " to " + id);
         }
@@ -127,7 +129,7 @@ function globalSerialParser(data, parser_id){
 	   	datas = data.split(":");
 	 	
 	 
-	} else if(data.substr(0,11) == "/controller"){
+	} else if(data.substr(0,15) == "/hardcontroller"){
 
 	   	datas = data.split(":");
 	 	sendMqtt(trim(datas[0]), trim(datas[1]));

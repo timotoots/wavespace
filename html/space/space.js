@@ -625,16 +625,19 @@ window.parseMqtt = parseMqtt;
 
 function soundSendSpeakers(i,gains){
 
-  if(typeof players[i] != "undefined"){
 
 
-    players[i].multislider.setAllSliders(gains);
 
-    gains.unshift(i+1);
+  // if(typeof players[i] != "undefined"){
 
-    socket.emit('message', gains.join(" "));
 
-  }
+  //   players[i].multislider.setAllSliders(gains);
+
+  //   gains.unshift(i+1);
+
+  //   socket.emit('message',);
+
+  // }
 
 
 }
@@ -648,7 +651,10 @@ setInterval(function(){
 
 			soundShapes[i].positionChanged = 0;
 
-			soundSendSpeakers(i,soundShapes[i].gains);
+			// soundSendSpeakers(i,soundShapes[i].gains);
+
+			sendMqtt("/speaker_gains/"+i,  soundShapes[i].gains.join(" "));
+
 
 			// console.log("Speaker distances for sound " + i);
 			// console.log(soundShapes[i].speakerDistances);
