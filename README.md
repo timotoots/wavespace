@@ -49,13 +49,13 @@ protocol websockets
 sudo service mosquitto restart
  ```
 
- 
 
-
-
-* Install Chromium
+* Clone this repository
 ```
-sudo apt install chromium-browser
+sudo apt install git
+sudo mkdir /opt/wavespace
+sudo chown timo:timo /opt/wavespace
+cd /opt && git clone https://github.com/timotoots/wavespace.git
 ```
 
 * Install Node JS and NPM
@@ -63,18 +63,43 @@ sudo apt install chromium-browser
 sudo apt install nodejs npm
 ```
 
-* Clone this repository
-```
-sudo apt get install git
-sudo mkdir /opt/wavespace
-cd /opt && git clone https://github.com/timotoots/wavespace.git
-```
-
 * Install node modules
 ```
 cd /opt/wavespace
 npm i
 ```
+
+* Startup
+```
+xinput map-to-output 9 HDMI-1
+xinput map-to-output 11 HDMI-2
+```
+
+
+
+* Install Apache
+```
+sudo apt install apache2
+```
+
+sudo nano /etc/apache2/sites-available/000-default.conf
+ln -s /opt/wavespace/node_modules /opt/wavespace/html/node_modules
+change directory line to 
+
+```
+DocumentRoot /opt/wavespace/html
+```
+
+
+* Install Chromium
+```
+sudo apt install chromium-browser
+```
+
+
+
+
+
 
 * Change configuration
 Add a new configuration file as you hostname.js 
@@ -84,7 +109,8 @@ Add a new configuration file as you hostname.js
 
 * Run 
 ```
-node server/server.js
+node services/hardcontroller/serial2mqtt.js
+node services/mixer/mixer.js
 ```
 
 # Use cheap Wifi LED RGB Bulbs
