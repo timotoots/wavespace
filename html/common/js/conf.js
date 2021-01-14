@@ -1,8 +1,15 @@
-// Config
-
-exports.getConf = function () {
 
 var conf = {};
+
+conf.mqtt_ip = '192.168.1.59';
+conf.mqtt_settings = {'username':'','password':''}
+conf.mqtt_prepend = 'wavespace'
+
+
+
+conf.pdBin = '/Applications/Pd-0.50-0.app/Contents/Resources/bin/pd';
+
+
 
 /////////////////////////////////////
 // Space dimensions in mm
@@ -15,9 +22,6 @@ conf.dimensions.z = 400;
 conf.spacesize_x = 2100;
 conf.spacesize_y = 1400;
 conf.spacesize_z = 400;
-
-/////////////////////////////////////
-// Sound players / Sound shapes
 
 conf.maxPlayers = 8;
 
@@ -64,10 +68,6 @@ conf.players = [
 	}
 ]
 
-/////////////////////////////////////
-// Speaker positions
-
-// soundcard channel, x, y, z, type
 conf.speakers = [
   [0,12,20],
   [1,125,53],
@@ -77,7 +77,7 @@ conf.speakers = [
   [5,187,105]
  ];
 
- conf.subwoofers = [
+  conf.subwoofers = [
  
  ]
 
@@ -89,24 +89,3 @@ conf.speakers = [
 conf.lights = [
 	[0,100,100]
 ];
-
-/////////////////////////////////////
-// Server
-
-conf.mqtt = 'ws://mjkeskus.local:9001';
-conf.wavespace_port = 3001;
-conf.pdBin = '/Applications/Pd-0.50-0.app/Contents/Resources/bin/pd';
-
-conf.launchChrome = false;
-conf.pdNoGui = false;
-conf.launchPd = true;
-
-conf.pdAudioApi = "pa";
-
-conf.useSerial = true;
-
-/////////////////////////////////////
-
-return conf;
-
-};

@@ -1,30 +1,73 @@
+<!DOCTYPE html>
 <html>
-<head>
-	<title>WaveSpace / Space</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<link rel=stylesheet href="css/style.css">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-	<!-- Space Scripts-->
-	<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js'></script>
-	<script src="js/stats.min.js"></script>
-	<script src="js/OrbitControls.js"></script>
-	<script src="js/THREEx.KeyboardState.js"></script>
-	<script src="js/THREEx.FullScreen.js"></script>
-	<script src="js/THREEx.WindowResize.js"></script>
-</head>
+    	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<title>Space</title>
+
+		<script type="text/javascript">
+			
+				const SCRIPT_NAME = "space";
+
+				var subscribe_topics = [
+					"/softcontroller/#",
+					"/hardcontroller/#"
+				];
+
+		</script>
+	 	<script type="text/javascript" src="../../node_modules/mqtt/dist/mqtt.min.js"></script>
+		<script type="text/javascript" src="../../node_modules/jquery/dist/jquery.min.js"></script>
+
+		<script type="text/javascript" src="../common/js/conf.js"></script>
+		<script type="text/javascript" src="../common/js/functions.js"></script>
+
+
+		<style type="text/css">
+
+			html, body {
+				height: 100%;
+				min-height: 100%;
+				margin: 0;
+				padding: 0;
+			}
+
+
+			#three_canvas {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 1920px;
+				z-index: 9;
+				height: 1080px;
+				overflow: hidden;
+
+
+			}
+
+			#header{
+				font-size: 9px;
+				position: absolute;
+				right: 10px;
+				top:0;
+				z-index: 11;
+				color: white;
+			}
+
+
+		</style>
+
+	</head>
+
 <body>
 
-<div id="message"></div>
+<div id="header">Wavespace Space/ MAAJAAM STUDIO</div>
 
-<div id="infoBox" title="Demo Information">
-	Controls: Up/Down arrow: move in global Z direction,Left/Right arrow: move in global X direction,A/D: rotate left/right
-</div>
-<!-- ------------------------------------------------------------ -->
+<div id="three_canvas"></div>
 
-<div id="3dcanvas" style="z-index: 2;"></div>
-
-<script src="space.js"></script>
+<script src="space.js"  type="module"></script>
 
 </body>
 </html>

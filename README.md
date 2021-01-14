@@ -26,10 +26,31 @@ firefox
 
 # Get it running
 
-* Install Ubuntu Studio with:
+* Install Ubuntu Studio (has Jack and Pd)
 
-	* pure data 
-	* jack
+* Install Mosquitto
+```
+sudo apt install mosquitto
+```
+
+* Enable websockets on mosquitto
+
+```
+sudo nano /etc/mosquitto/mosquitto.conf
+```
+
+Add lines:
+```
+listener 1883
+listener 1884
+protocol websockets
+```
+```
+sudo service mosquitto restart
+ ```
+
+ 
+
 
 
 * Install Chromium

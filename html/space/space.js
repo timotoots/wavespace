@@ -1,10 +1,30 @@
 
+
+import * as THREE from '../../node_modules/three/build/three.module.js';
+
+
+import { OrbitControls } from '../../node_modules/three/examples/jsm/controls/OrbitControls.js';
+
+
+import Stats 		 from '../../node_modules/three/examples/jsm/libs/stats.module.js';
+
+import { ColladaLoader } from '../../node_modules/three/examples/jsm/loaders/ColladaLoader.js';
+
+import { RectAreaLightUniformsLib } from '../../node_modules/three/examples/jsm/lights/RectAreaLightUniformsLib.js';
+
+import { EffectComposer } from '../../node_modules/three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from '../../node_modules/three/examples/jsm/postprocessing/RenderPass.js';
+
+
+import { TWEEN } from "../../node_modules/three/examples/jsm/libs/tween.module.min.js";
+
+
 // MAIN
 var koll;
 
 // standard global variables
 var container, scene, camera, renderer, controls, stats;
-var keyboard = new THREEx.KeyboardState();
+// var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 // custom global variables
 
@@ -178,15 +198,15 @@ function init()
 	container = document.getElementById( 'three_canvas' );
 	container.appendChild( renderer.domElement );
 	// EVENTS
-	THREEx.WindowResize(renderer, camera);
-	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
+	// THREEx.WindowResize(renderer, camera);
+	// THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
 
 
 
 
 
 	// CONTROLS
-	controls = new THREE.OrbitControls( camera, renderer.domElement );
+	controls = new OrbitControls( camera, renderer.domElement );
 	controls.enablePan = false;
 
 	// STATS
@@ -445,19 +465,19 @@ function update(){
 	var moveDistance = 200 * delta; // 200 pixels per second
 	var rotateAngle = Math.PI / 2 * delta;   // pi/2 radians (90 degrees) per second
 	
-	if ( keyboard.pressed("A") )
-		MovingCube.rotation.y += rotateAngle;
-	if ( keyboard.pressed("D") )
-		MovingCube.rotation.y -= rotateAngle;
+	// if ( keyboard.pressed("A") )
+	// 	MovingCube.rotation.y += rotateAngle;
+	// if ( keyboard.pressed("D") )
+	// 	MovingCube.rotation.y -= rotateAngle;
 			
-	if ( keyboard.pressed("left") )
-		MovingCube.position.x -= moveDistance;
-	if ( keyboard.pressed("right") )
-		MovingCube.position.x += moveDistance;
-	if ( keyboard.pressed("up") )
-		MovingCube.position.z -= moveDistance;
-	if ( keyboard.pressed("down") )
-		MovingCube.position.z += moveDistance;
+	// if ( keyboard.pressed("left") )
+	// 	MovingCube.position.x -= moveDistance;
+	// if ( keyboard.pressed("right") )
+	// 	MovingCube.position.x += moveDistance;
+	// if ( keyboard.pressed("up") )
+	// 	MovingCube.position.z -= moveDistance;
+	// if ( keyboard.pressed("down") )
+	// 	MovingCube.position.z += moveDistance;
 
 
 
@@ -526,47 +546,70 @@ function calculateNewOrbitCurve(id){
 
 }
 
+function parseMqtt(topic, message){
+
+
+  topic = topic.split("/");
+
+  
+
+  if(topic[2]>0 && topic[2]<5 &&  topic[3]){
+
+
+  	console.log(topic[2]+""+topic[3] + message);
+  		spaceChangeSoundShape(topic[2],topic[3],message);
+
+
+  }
+
+  console.log(topic);
+
+  }
+
 function spaceChangeSoundShape(i,param,value){
 
-	if(param=="position_x"){
+	if(param=="POS_X"){
     	// soundShapes[i].position.x = mapValues(value,0,1,0,conf.dimensions.x);
-    	soundOrbits[i].line.position.x =  mapValues(value,0,1,0,conf.dimensions.x);
+    	soundOrbits[i].line.position.x =  mapValues(value,0,255,0,conf.dimensions.x);
     	soundOrbits[i].changed = true;
 
-	} else if(param=="position_y"){
+	} else if(param=="POS_Y"){
     	// soundShapes[i].position.z = mapValues(value,0,1,0,conf.dimensions.y);
-    	soundOrbits[i].line.position.z =  mapValues(value,0,1,0,conf.dimensions.y);
+    	soundOrbits[i].line.position.z =  mapValues(value,0,255,0,conf.dimensions.y);
     	soundOrbits[i].changed = true;
 
-	} else if(param=="position_z"){
+	} else if(param=="POS_Z"){
     	// soundShapes[i].position.y = mapValues(value,0,1,0,conf.dimensions.z);
-    	soundOrbits[i].line.position.y =  mapValues(value,0,1,0,conf.dimensions.z);
+    	soundOrbits[i].line.position.y =  mapValues(value,0,255,0,conf.dimensions.z);
     	soundOrbits[i].changed = true;
 
-	} else if(param=="scale_x"){
-    	soundShapes[i].scale.x = mapValues(value,0,1,0.0001,5, false,4);
+	} else if(param=="SHAPE_WIDTH"){
+    	soundShapes[i].scale.x = mapValues(value,0,255,0.0001,5, false,4);
 
-	} else if(param=="scale_y"){
-    	soundShapes[i].scale.z = mapValues(value,0,1,0.0001,5, false,4);
+	} else if(param=="SHAPE_LENGTH"){
+    	soundShapes[i].scale.z = mapValues(value,0,255,0.0001,5, false,4);
 
-	} else if(param=="scale_z"){
-    	soundShapes[i].scale.y = mapValues(value,0,1,0.0001,5, false,4);
+	} else if(param=="SHAPE_HEIGHT"){
+    	soundShapes[i].scale.y = mapValues(value,0,255,0.0001,5, false,4);
 
-	} else if(param=="orbit_x"){
-		soundOrbits[i].line.scale.x = mapValues(value,0,1,0.0001,5, false,4);
+	} else if(param=="SHAPE_BLUR"){
+    	console.log("no shape blur yet!");
+
+	} else if(param=="ORBIT_WIDTH"){
+		soundOrbits[i].line.scale.x = mapValues(value,0,255,0.0001,5, false,4);
 		soundOrbits[i].changed = true;
     	// soundOrbits[i].line.scale.x = mapValues(value,0,1,0,5);
 
-	} else if(param=="orbit_y"){
-		soundOrbits[i].line.scale.y = mapValues(value,0,1,0.0001,5, false,4);
+	} else if(param=="ORBIT_LENGTH"){
+		soundOrbits[i].line.scale.y = mapValues(value,0,255,0.0001,5, false,4);
 		soundOrbits[i].changed = true;
 
-	} else if(param=="orbit_z"){
-		soundOrbits[i].line.rotation.x = mapValues(value,0,1,0,degrees_to_radians(360),false,5);
+	} else if(param=="ORBIT_ROTATE"){
+		soundOrbits[i].line.rotation.x = mapValues(value,0,255,0,degrees_to_radians(360),false,5);
 		soundOrbits[i].changed = true;
-	} else if(param=="orbit_speed"){
+	} else if(param=="ORBIT_SPEED"){
 		// soundOrbits[i].looptime = mapValues(value,0,1,-20 * 1000,20 * 1000);
-		soundOrbits[i].speed = mapValues(value,0,1,-20,20);
+		soundOrbits[i].speed = mapValues(value,0,255,-20,20);
 
 
 	}
@@ -576,6 +619,25 @@ function spaceChangeSoundShape(i,param,value){
 
 }
 
+window.spaceChangeSoundShape = spaceChangeSoundShape;
+window.parseMqtt = parseMqtt;
+
+
+function soundSendSpeakers(i,gains){
+
+  if(typeof players[i] != "undefined"){
+
+
+    players[i].multislider.setAllSliders(gains);
+
+    gains.unshift(i+1);
+
+    socket.emit('message', gains.join(" "));
+
+  }
+
+
+}
 setInterval(function(){
 
 	

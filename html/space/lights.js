@@ -2,6 +2,8 @@
 
 
 // var mqtt = require('mqtt')
+
+
 var client  = mqtt.connect(conf.mqtt)
 
 client.on('connect', function () {

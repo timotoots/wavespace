@@ -6,11 +6,11 @@
 
     	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-		<title>Soundplayer</title>
+		<title>Softcontroller</title>
 
 		<script type="text/javascript">
 			
-				const SCRIPT_NAME = "soundplayer";
+				const SCRIPT_NAME = "softcontroller";
 
 				var subscribe_topics = [
 					"/softcontroller/#",
@@ -20,6 +20,8 @@
 		</script>
 	 	<script type="text/javascript" src="../../node_modules/mqtt/dist/mqtt.min.js"></script>
 		<script type="text/javascript" src="../../node_modules/jquery/dist/jquery.min.js"></script>
+		<script type="text/javascript" src="nexus-js.js"></script>
+
 
 		<script type="text/javascript" src="../common/js/conf.js"></script>
 		<script type="text/javascript" src="../common/js/functions.js"></script>
@@ -27,34 +29,54 @@
 
 		<style type="text/css">
 
-			html, body {
-				height: 100%;
-				min-height: 100%;
-				margin: 0;
-				padding: 0;
-			}
+		.player{
+	background: gray;
+	width: 260px;
+	float: left;
+	padding: 10px;
+	margin-left:10px;
+
+}
 
 
-			#three_canvas {
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 1920px;
-				z-index: 9;
-				height: 1080px;
-				overflow: hidden;
+
+[nexus-ui]{
+	float: left;
+}
+
+.pos{
+	width: 250px;
+	height: 100px;
+}
 
 
-			}
+.shape div{
+	float: left;
+}
 
-			#header{
-				font-size: 9px;
-				position: absolute;
-				right: 10px;
-				top:0;
-				z-index: 11;
-				color: white;
-			}
+.shape{
+	width: 150;
+	height: 70px;
+}
+
+.orbit{
+	width: 250px;
+	height: 70px;
+}
+
+.dial_header{
+	width: 250px;
+	text-align: center
+}
+
+.main_header{
+	width: 250px;
+	font-weight: bold;
+}
+
+.main_header div{
+	margin-right: 20px;
+}
 
 
 		</style>
@@ -63,15 +85,14 @@
 
 <body>
 
-<div id="header">Wavespace Space/ MAAJAAM STUDIO</div>
+<div id="header">Wavespace Softcontroller / MAAJAAM STUDIO</div>
 
 <p><input type="checkbox" id="mqtt_update"> Update controls from MQTT?</p>
 
-<div id="players"></div>
-  
-<div id="message"></div>
 
-<script type="text/javascript" src="soundplayer.js"></script>
+<div class="" id="players"></div>
+
+<script type="text/javascript" src="softcontroller.js"></script>
 
 </body>
 </html>

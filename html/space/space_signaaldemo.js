@@ -1,25 +1,25 @@
 
 
-import * as THREE from '/node_modules/three/build/three.module.js';
+import * as THREE from '..../node_modules/three/build/three.module.js';
 
 
 import { OrbitControls } from '/node_modules/three/examples/jsm/controls/OrbitControls.js';
 
 
-import Stats 		 from '/node_modules/three/examples/jsm/libs/stats.module.js';
+import Stats 		 from '../node_modules/three/examples/jsm/libs/stats.module.js';
 
-import { ColladaLoader } from '/node_modules/three/examples/jsm/loaders/ColladaLoader.js';
+import { ColladaLoader } from '../node_modules/three/examples/jsm/loaders/ColladaLoader.js';
 
-import { RectAreaLightUniformsLib } from '/node_modules/three/examples/jsm/lights/RectAreaLightUniformsLib.js';
+import { RectAreaLightUniformsLib } from '../node_modules/three/examples/jsm/lights/RectAreaLightUniformsLib.js';
 
-import { EffectComposer } from '/node_modules/three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from '/node_modules/three/examples/jsm/postprocessing/RenderPass.js';
+import { EffectComposer } from '../node_modules/three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from '../node_modules/three/examples/jsm/postprocessing/RenderPass.js';
 // import { UnrealBloomPass } from './node_modules/three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
 
 // import { UnrealBloomPass } from '/lib/unreal_bloompass_selective.js';
 
-import { TWEEN } from "/node_modules/three/examples/jsm/libs/tween.module.min.js";
+import { TWEEN } from "../node_modules/three/examples/jsm/libs/tween.module.min.js";
 
 // MAIN
 var koll;

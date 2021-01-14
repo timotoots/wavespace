@@ -69,14 +69,21 @@ void setup_pot(void){
 
 void loop_pot(void * parameter){
 
+ int publish_pots_now = 0;
+ 
+ if(publish_all_pots==1){
+  publish_all_pots = 0;
+  publish_pots_now = 1;
+ }
+
  for (int s = 0; s < SENSORS; s++){
   sensor_read(s);
   int average = average_reading(s);
   int diff = abs(average - last_published_reading[s]);
    
-  if(diff > 2){
+  if(diff > 2 || publish_pots_now==1){
 
-    Serial.print("/controller");
+    Serial.print("/hardcontroller/");
     Serial.print(CONTROLLER_ID);
     Serial.print("/pot/");
     Serial.print(POT_LABELS[s]);
@@ -86,6 +93,7 @@ void loop_pot(void * parameter){
     last_published_reading[s] = average;
   }
  } // for
+
  
  delay(10);
 }

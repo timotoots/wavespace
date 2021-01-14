@@ -25,6 +25,9 @@ void setup_led_analog(){
   ledcAttachPin(2, 0); // mosfet 0
   ledcAttachPin(21, 1); // mosfet 1
 
+  // change_mosfet(0,12);
+  // change_mosfet(1,12);
+
 }
 
 void change_mosfet(int i, int power){

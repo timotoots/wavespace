@@ -14,10 +14,12 @@ unsigned long ledBlinkPreviousMillis[NUM_LEDS] = {0};
 
 void setup_rgb() { 
    FastLED.addLeds<WS2812, WSLED_PIN, RGB>(leds, NUM_LEDS).setCorrection(Typical8mmPixel);
+   FastLED.setMaxRefreshRate(25);
    for(int i=0;i<NUM_LEDS;i++){
       leds[i] = CRGB::Black;
       FastLED.show();
    }
+   change_led(0,20,0,0,2);
 }
 
 void change_led(int id, int red, int green, int blue, int led_blink){

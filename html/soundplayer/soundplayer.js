@@ -1,52 +1,103 @@
-
 ////////////////////////////////////////////////////////////////////////
 
-// Socket input
+// Wavespace Sound Player
 
-  var socket = io(conf.wavespace_server,{ transports: ['websocket', 'polling'] });
+// Multichannel Audio player
+// Plays 8 mono tracks through Jack to PureData
 
-  socket.on('message', function(msg){
-    console.log(msg);
-    document.getElementById("message").innerHTML = msg;
-  });
+// Controller: pause, volume, soundfile
 
 
+////////////////////////////////////////////////////////////////////////
 
 var players = [];
 
+conf.maxPlayers = 4;
+
 ////////////////////////////////////////////////////////////////////////
 
-  var speakersInSpace = [
-  [0,12,20],
-  [1,125,53],
-  [2,196,12],
-  [6,89,88],
-  [7,30,105],
-  [5,187,105]
-  ];
 
-var spaceDimensions = [210,140];
+////////////////////////////////////////////////////////////////////////
 
-/*
-var speakers = [];
+var last_paused_1 = new Date().getTime();
+var last_paused_2 = new Date().getTime();
+var last_paused_3 = new Date().getTime();
+var last_paused_4 = new Date().getTime();
+
+////////////////////////////////////////////////////////////////////////
+
+function parseMqtt(topic, message){
 
 
+  topic = topic.split("/");
+  console.log(topic);
 
-for (var i = 0; i < speakersInSpace.length; i++) {
+  if(topic[1]=="softcontroller" && topic[2]>0 &&  topic[2]<4 && topic[3]){ //  && document.getElementById('mqtt_update').checked==true
 
-  speakers[i] = [];
-  speakers[i][0] = mapValues(speakersInSpace[i][1],0,spaceDimensions[0],1,0);
-  speakers[i][1] = mapValues(speakersInSpace[i][2],0,spaceDimensions[1],1,0);
-
-
-}
-
-  */
+      var now = new Date().getTime();
 
 
 
-const button = document.querySelector('button');
+    if( topic[2]==1){
+      var controller = 0;
+      if(now - last_paused_1 < 1000 && topic[3]=="PAUSE"){
+          return false;
+      }
 
+        last_paused_1 = now;
+    } else if(topic[2]=="2" ){
+      var controller = 1;
+      if(now - last_paused_2 < 1000  && topic[3]=="PAUSE"){
+          return false;
+      }
+       last_paused_2 = now;
+
+          } else if(topic[2]=="3" ){
+      var controller = 2;
+ 
+       if(now - last_paused_3 < 1000  && topic[3]=="PAUSE"){
+          return false;
+      }
+
+      last_paused_3 = now;
+
+         } else if(topic[3]=="4" ){
+      var controller = 3;
+ 
+       if(now - last_paused_4 < 1000  && topic[3]=="PAUSE"){
+          return false;
+      }
+       last_paused_4 = now;
+
+         }
+
+      if(topic[3]=="PAUSE"){
+
+
+        if (players[controller].audioElement.duration > 0 && !players[controller].audioElement.paused ) {
+            players[controller].audioElement.pause();
+            console.log("Pause player" + (controller+1));
+        } else {
+            players[controller].audioElement.play();
+            console.log("Play player" + (controller+1));
+        }
+
+
+      }  else if(topic[3]=="VOLUME"){
+
+          players[controller].audioElement.volume = mapValues(message,0, 255, 0, 1);
+
+
+      } else if(topic[3]=="tag_on"){
+
+          players[controller].audioElement.volume = mapValues(message,0, 255, 0, 1);
+
+
+      }
+
+  }
+
+  }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -60,12 +111,11 @@ const button = document.querySelector('button');
   context.destination.channelCountMode = 'explicit';
   context.destination.channelCount = context.destination.maxChannelCount;
 
-  Nexus.context = context;
 
   console.log("You sound card has " + context.destination.maxChannelCount  + " channels.")
 
   if(context.destination.maxChannelCount < conf.maxPlayers ){
-    conf.maxPlayers  = context.destination.maxChannelCount;
+    // conf.maxPlayers  = context.destination.maxChannelCount;
   }
 
 
@@ -100,7 +150,7 @@ for (var i = 0; i < players.length; i++) {
 
 }
 
-players[0].audioElement.src = 'data/'+ch+'.wav';
+players[0].audioElement.src = '../data/'+ch+'.wav';
 
 players[0].audioElement.play();
 
@@ -115,35 +165,20 @@ for (var i = 0; i < 16; i++) {
   }
 }
 
-socket.emit('message', msg.join(" "));
+// socket.emit('message', msg.join(" "));
 
 
 
 
 }
-////////////////////////////////////////////////////////////////////////
 
-function soundSendSpeakers(i,gains){
-
-  if(typeof players[i] != "undefined"){
-
-
-    players[i].multislider.setAllSliders(gains);
-
-    gains.unshift(i+1);
-
-    socket.emit('message', gains.join(" "));
-
-  }
-
-
-}
 
 ////////////////////////////////////////////////////////////////////////
 
 // Init
 
 document.addEventListener('DOMContentLoaded', function() {
+
 
 
 
@@ -156,60 +191,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
-/////////////////////////////////////////////////////////////////////////////////
-
-    socket.on('serial-mqtt', function(data){
-      topic = data.topic.split("/");
-      var controller = topic[1].replace("controller","");
-      //console.log(data.payload);
-
-      if(topic[3]=="POS_X"){
-          players[controller].position.x = mapValues(data.payload,0,255,0,1);
-      } else if(topic[3]=="POS_Y"){
-          players[controller].position.y = mapValues(data.payload,0,255,0,1);
-      } else if(topic[3]=="POS_Z"){
-          players[controller].slider_pos_z.value = mapValues(data.payload,0,255,0,1);
-      } else if(topic[3]=="ORBIT_WIDTH"){
-          players[controller].dial_orbit_x.value = mapValues(data.payload,0,255,0,1);
-      } else if(topic[3]=="ORBIT_LENGTH"){
-          players[controller].dial_orbit_y.value = mapValues(data.payload,0,255,0,1);
-      } else if(topic[3]=="ORBIT_ROTATE"){
-          players[controller].dial_orbit_z.value = mapValues(data.payload,0,255,0,1);
-      } else if(topic[3]=="ORBIT_SPEED"){
-          players[controller].dial_orbit_speed.value = mapValues(data.payload,0,255,0,1);
-      } else if(topic[3]=="SHAPE_WIDTH"){
-          players[controller].dial_scale_x.value = mapValues(data.payload,0,255,0,1);
-      } else if(topic[3]=="SHAPE_LENGTH"){
-          players[controller].dial_scale_y.value = mapValues(data.payload,0,255,0,1);
-      } else if(topic[3]=="SHAPE_HEIGHT"){
-          players[controller].dial_scale_z.value = mapValues(data.payload,0,255,0,1);
-      } else if(topic[3]=="SHAPE_BLUR"){
-
-      } else if(topic[3]=="VOLUME"){
-         players[controller].audioElement.volume = mapValues(data.payload,0,255,0,1);
-      }
-
-    });
-
-/////////////////////////////////////////////////////////////////////////////////
-
-function setDefaults(){
-
-  var controller = 0;
-
- players[controller].position.x = 0.31
- players[controller].position.y =  0.35
-players[controller].dial_orbit_x.value =  0.12
-players[controller].dial_orbit_y.value = 0.12
-players[controller].dial_orbit_z.value  = 0.25
-players[controller].dial_orbit_speed.value = 0.52
-players[controller].dial_scale_x.value =  0.005
-players[controller].dial_scale_y.value =  0.005
-players[controller].dial_scale_z.value = 0.005
 
 
-
-}
 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -231,7 +214,7 @@ function createPlayer(i){
   div.insertAdjacentHTML('afterbegin','<div class="header">Player'+ i +'</div>');
 
   players[i].audioElement = document.createElement('audio');
-  players[i].audioElement.src = 'data/speaker_test_aki/'+i+'.mp3';
+  players[i].audioElement.src = '../data/speaker_test_aki/'+i+'.mp3';
   players[i].audioElement.id = "audioElement"+i
   players[i].audioElement.crossOrigin = 'anonymous';
   players[i].audioElement.autoplay = true;
@@ -251,231 +234,9 @@ function createPlayer(i){
 
    setTimeout(function(  ){
     players[i].audioElement.pause();
-     setDefaults();
+     // setDefaults();
   },1000);
 
-
-
-  ////////////////////////
-  // UI Element: 2D Panner
-/*
-  var pan2d =  Nexus.Add.Pan2D('#player'+i,{
-    'size': [spaceDimensions[0]*1,spaceDimensions[1]*1],
-    'range': 0.4,  // detection radius of each speaker
-    'mode': 'absolute',   // 'absolute' or 'relative' sound movement
-    'speakers': speakers
-    
-  })
-
-  pan2d.on('change',function(v) {
-  
-      // change volume sliders
-      players[i].multislider.setAllSliders(v);
-
-      v.unshift(i+1);
-      socket.emit('message', v.join(" "));
-      
-     // console.log(v);
-
-  });
-*/
-  //////////////////////
-  // UI Element: Joystick
-
-  players[i].position =  Nexus.Add.Position('#player'+i,{
-  'size': [100,100],
-  'mode': 'absolute',  // "absolute" or "relative"
-  'x': 0.5,  // initial x value
-  'minX': 0,
-  'maxX': 1,
-  'stepX': 0,
-  'y': 0.5,  // initial y value
-  'minY': 0,
-  'maxY': 1,
-  'stepY': 0
-});
-
-  players[i].position.on('change',function(v) {
-
-    spaceChangeSoundShape(i,"position_x",v.x);
-    spaceChangeSoundShape(i,"position_y",v.y);
-
-    // soundShapes[i].position.x = mapValues(v.x,0,1,0,conf.dimensions.x);
-    // soundShapes[i].position.z = mapValues(v.y,0,1,0,conf.dimensions.y);
-  
-
-    // MovingCube.position.x = mapValues(v.x,0,1,0,conf.spacesize_x);
-    // MovingCube.position.z = mapValues(v.y,0,1,0,conf.spacesize_y);
-
-    //console.log(v);
-  })
-
-
-
-  //////////////////////
-  // UI Element: VSlider
-
-  players[i].slider_pos_z =  Nexus.Add.Slider('#player'+i,{
-    'size': [20,120],
-    'mode': 'absolute',  // "absolute" or "relative"
-    'min': 0,
-    'max': 1,
-    'step': 0,
-    'value': 0,
-  });
-
-  players[i].slider_pos_z.on('change',function(v) {
-
-    spaceChangeSoundShape(i,"position_z",v);
-
-    //console.log(v);
-  })
-
-
-  //////////////////////
-  // UI Element: Dial Scale X
-
-  players[i].dial_scale_x =  Nexus.Add.Dial('#player'+i,{
-    'size': [40,40],
-    'interaction': 'vertical', // "radial", "vertical", or "horizontal"
-    'mode': 'relative', // "absolute" or "relative"
-    'min': 0,
-    'max': 1,
-    'step': 0,
-    'value': 0
-  });
-
-  players[i].dial_scale_x.on('change',function(v) {
-    spaceChangeSoundShape(i,"scale_x",v);
-  })
-
-  //////////////////////
-  // UI Element: Dial Scale Y
-
-  players[i].dial_scale_y =  Nexus.Add.Dial('#player'+i,{
-    'size': [40,40],
-    'interaction': 'vertical', // "radial", "vertical", or "horizontal"
-    'mode': 'relative', // "absolute" or "relative"
-    'min': 0,
-    'max': 1,
-    'step': 0,
-    'value': 0
-  });
-
-  players[i].dial_scale_y.on('change',function(v) {
-    spaceChangeSoundShape(i,"scale_y",v);
-  })
-
-    //////////////////////
-  // UI Element: Dial Scale Z
-
-  players[i].dial_scale_z =  Nexus.Add.Dial('#player'+i,{
-    'size': [40,40],
-    'interaction': 'vertical', // "radial", "vertical", or "horizontal"
-    'mode': 'relative', // "absolute" or "relative"
-    'min': 0,
-    'max': 1,
-    'step': 0,
-    'value': 0
-  });
-
-  players[i].dial_scale_z.on('change',function(v) {
-    spaceChangeSoundShape(i,"scale_z",v);
-  })
-
-
-
-
-
-
-
-  //////////////////////
-  // UI Element: Dial Orbit X
-
-  players[i].dial_orbit_x =  Nexus.Add.Dial('#player'+i,{
-    'size': [40,40],
-    'interaction': 'vertical', // "radial", "vertical", or "horizontal"
-    'mode': 'relative', // "absolute" or "relative"
-    'min': 0,
-    'max': 1,
-    'step': 0,
-    'value': 0
-  });
-
-
-  players[i].dial_orbit_x.on('change',function(v) {
-    spaceChangeSoundShape(i,"orbit_x",v);
-  })
-
-  //////////////////////
-  // UI Element: Dial Orbit Y
-
-  players[i].dial_orbit_y =  Nexus.Add.Dial('#player'+i,{
-    'size': [40,40],
-    'interaction': 'vertical', // "radial", "vertical", or "horizontal"
-    'mode': 'relative', // "absolute" or "relative"
-    'min': 0,
-    'max': 1,
-    'step': 0,
-    'value': 0
-  });
-
-  players[i].dial_orbit_y.on('change',function(v) {
-    spaceChangeSoundShape(i,"orbit_y",v);
-  })
-
-    //////////////////////
-  // UI Element: Dial Orbit Z
-
-  players[i].dial_orbit_z =  Nexus.Add.Dial('#player'+i,{
-    'size': [40,40],
-    'interaction': 'vertical', // "radial", "vertical", or "horizontal"
-    'mode': 'relative', // "absolute" or "relative"
-    'min': 0,
-    'max': 1,
-    'step': 0,
-    'value': 0
-  });
-
-  players[i].dial_orbit_z.on('change',function(v) {
-    spaceChangeSoundShape(i,"orbit_z",v);
-  })
-
-
-    //////////////////////
-  // UI Element: Dial Orbit Speed
-
-  players[i].dial_orbit_speed =  Nexus.Add.Dial('#player'+i,{
-    'size': [40,40],
-    'interaction': 'vertical', // "radial", "vertical", or "horizontal"
-    'mode': 'relative', // "absolute" or "relative"
-    'min': 0,
-    'max': 1,
-    'step': 0,
-    'value': 0.5
-  });
-
-  players[i].dial_orbit_speed.on('change',function(v) {
-    spaceChangeSoundShape(i,"orbit_speed",v);
-  })
-
-
-
-
-
-//////////////////////
-
-players[i].multislider =  Nexus.Add.Multislider('#player'+i,{
- 'size': [200,100],
- 'numberOfSliders': 5,
- 'min': 0,
- 'max': 1,
- 'step': 0,
- 'candycane': 3,
- 'values': [0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1],
- 'smoothing': 0,
- 'mode': 'bar'  // 'bar' or 'line'
-});
 
 // var oscilloscope =  Nexus.Add.Spectrogram('#player'+i,{
 //   'size': [300,150]
@@ -487,3 +248,6 @@ players[i].multislider =  Nexus.Add.Multislider('#player'+i,{
 
 
 /////////////////////////////////////////////////////////////////////////////////
+
+
+

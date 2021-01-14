@@ -2,7 +2,7 @@
 int currentState[5] = {-1,-1,-1,-1,-1};
 #include "esp_task_wdt.h"
 
-#define CONTROLLER_ID 4
+#define CONTROLLER_ID 1
 
 const int DEBUG_ENABLED = 1;
 #include "CommandLine.h"
@@ -10,6 +10,7 @@ const int DEBUG_ENABLED = 1;
 TaskHandle_t Task1;
 TaskHandle_t Task2;
 
+int publish_all_pots = 0;
 
 int matrix_display = -1;
 
@@ -24,7 +25,7 @@ int matrix_display = -1;
     setup_touch();
     setup_rgb();
     setup_pot();
-     setup_led_analog();
+   //  setup_led_analog();
 
   xTaskCreatePinnedToCore(
       Task1code,   /* Task function. */
@@ -55,10 +56,15 @@ bool parse_command(char * commandLine) {
 
   char * ptrToCommandName = strtok(commandLine, delimiters);
 
-  if (strcmp(ptrToCommandName, "10000") == 0) {
+if (strcmp(ptrToCommandName, "10000") == 0) {
 
        Serial.print("DEVICE_ID: ");
        Serial.println(10000 + CONTROLLER_ID);
+            
+  } else if (strcmp(ptrToCommandName, "publish_all") == 0) {
+
+       Serial.println("Publishing all pots");
+       publish_all_pots = 1;
             
   } else if (strcmp(ptrToCommandName, "led") == 0) {
      int led_id = readNumber();
@@ -90,7 +96,7 @@ bool parse_command(char * commandLine) {
     Serial.print(": power ");     
     Serial.print(led_power);
 
-    change_mosfet(led_id, led_power);
+  //  change_mosfet(led_id, led_power);
 
             
   } else {
