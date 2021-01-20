@@ -7,6 +7,17 @@
 
 // configuration
 
+
+let NodeMonkey = require("node-monkey")
+let monkey = NodeMonkey({
+  server: {
+    disableLocalOutput: false,
+    port:5001
+  },
+})
+
+/////////////////////////////////////////////////
+
 var serial_ports = [
 	"/dev/ttyUSB0",
 	"/dev/ttyUSB1",
@@ -17,7 +28,7 @@ var serial_ports = [
 
 var mqtt_prepend = "wavespace";
 
-var mqtt_server = "192.168.1.59";
+var mqtt_server = "wavespace.local";
 var mqtt_user = ""
 var mqtt_pass = ""
 
@@ -27,6 +38,8 @@ var mqtt = require('mqtt')
 var client  = mqtt.connect('mqtt://'+mqtt_server,{"username":mqtt_user,"password":mqtt_pass})
 
 client.on('connect', function () {
+      client.subscribe('wavespace/hardcontroller_publish_all/#',function(err) {});
+      
   client.subscribe('wavespace/set_controller/#', function (err) {
     if (!err) {
       client.publish('wavespace/serial2mqtt', 'started')
@@ -97,6 +110,45 @@ parsers[5].on('data', function(data){
 var portMapping = {};
 
 
+/////////////////////////////////////////////////
+
+// Tag reading
+
+var tagReaders = {};
+
+function checkTags(){
+
+	now = new Date().getTime();
+
+	for(reader_id in tagReaders){
+		if(now - tagReaders[reader_id].updated > 1000 && tagReaders[reader_id].tag!=""){
+			tagReaders[reader_id].tag = "";
+			sendMqtt("/hardcontroller/"+reader_id+"/pot/TAG_OFF", "");
+		}
+	}
+
+    setTimeout(checkTags,500);
+
+}
+
+checkTags();
+
+function onTag(reader_id, tag_id){
+
+	if(!tagReaders[reader_id]){
+		tagReaders[reader_id] = {updated:0,tag:""};
+	}
+
+	tagReaders[reader_id].updated = new Date().getTime();
+	if(tagReaders[reader_id].tag != tag_id){
+		sendMqtt("/hardcontroller/"+reader_id+"/pot/TAG_ON", tag_id);
+		tagReaders[reader_id].tag = tag_id;
+	} 
+
+}
+
+/////////////////////////////////////////////////
+
 function globalSerialParser(data, parser_id){
 
 
@@ -119,9 +171,7 @@ function globalSerialParser(data, parser_id){
     	var tag = data.split("/");
     	if(tag.length == 6){ // "/controller/4/tag/%s"
     		if(tag[1]=="controller" && tag[2]>0 && tag[3]=="tag" && tag[4]!=""){
-
-
-    			sendMqtt("/hardcontroller/"+tag[2]+"/TAG_ON", trim(tag[4]));
+    			onTag(tag[2],trim(tag[4]));
     		} 
     		
     	}
@@ -145,9 +195,17 @@ function globalSerialParser(data, parser_id){
 
 
 function parseMqtt(topic, message){
+
 	topic = topic.split("/");
 
-	if(topic[1]=="set_controller"){
+	if(topic[1]=="hardcontroller_publish_all"){
+
+		id = topic[2];
+    	if(id >= 10001 && id<=10000+num_ports){
+	   		ports[portMapping[id]].port.write("publish_all\n"); // ask to idetify
+	    }
+
+	} else if(topic[1]=="set_controller"){
 
 		if(topic[2]){
 			id = topic[2];
