@@ -1,11 +1,6 @@
 
 
-
-// var mqtt = require('mqtt')
-
-
-var client  = mqtt.connect(conf.mqtt)
-
+/*
 client.on('connect', function () {
 
 	client.publish('cmnd/pirn03/POWER', "OFF")
@@ -33,14 +28,15 @@ function blink(){
 
 
 var curPower = 0;
+*/
 
-var lastLedChange = [0,0,0];
+var lastLedChange = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
 
 
-function changeLed(id,power){
+function changeLed(id,color){
 
-	power = Math.round(power);
+	// power = Math.round(power);
 
 	 var d = new Date();
 	  var n = d.getTime();
@@ -52,18 +48,26 @@ function changeLed(id,power){
 
 	lastLedChange[id] = n;
 
-	if(curPower==power){
-		return false;
-	}
-	curPower = power;
+	// if(curPower==power){ 
+	// 	return false;
+	// }
+	// curPower = power;
 
 
 	if(id==0){
 		id = "01";
 	}
 
-	console.log(power);
-	client.publish('cmnd/pirn'+id+'/Dimmer', power.toString());
+	if(id<10){
+		id = "0"+id;
+	}
+	client.publish('cmnd/pirn'+id+'/Speed', "10");
+
+	client.publish('cmnd/pirn'+id+'/Color1', "#"+color);
+
+	console.log('MQTT:' + 'cmnd/pirn'+id+'/Color1' +  " #"+color);
+	//client.publish('cmnd/pirn'+id+'/Dimmer', power.toString());
+
 
 }
 

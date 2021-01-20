@@ -55,7 +55,7 @@ animate();
 function createSoundshape(id){
 
 	var wallGeometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
-	var wallMaterial = new THREE.MeshBasicMaterial( {color: 0x8888ff,wireframe:true,transparent: true, opacity: 0.25} );
+	var wallMaterial = new THREE.MeshBasicMaterial( {color: 0x8888ff,wireframe:false,transparent: true, opacity: 0.25} );
 
 
 
@@ -119,6 +119,8 @@ function changeOrbit(id, type){
 	var line = new THREE.Line( geometry, material );
 
 	soundOrbits[id].line = line;
+	soundOrbits[id].line.rotation.x = degrees_to_radians(90);
+
 	soundOrbits[id].points = points;
 	soundOrbits[id].changed = true;
 
@@ -142,7 +144,7 @@ function createSpeaker(id){
 	var cubeGeometry = new THREE.BoxBufferGeometry( 10, 120, 60 );
 	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x424141 } );
 	speakers[id] = new THREE.Mesh( cubeGeometry, wireMaterial );
-	speakers[id].position.set(conf.speakers[id][1]*10,100,conf.speakers[id][2]*10);
+	speakers[id].position.set(conf.speakers[id][1]/10,100,conf.speakers[id][2]/10);
 	speakers[id].shapeType = "speaker";
 	speakers[id].name = id;
 	speakers[id].brightness = [];
@@ -182,11 +184,11 @@ function init()
 	// CAMERA
 	var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
 	console.log(SCREEN_WIDTH);
-	var VIEW_ANGLE = 75, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
+	var VIEW_ANGLE = 75, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 30000;
 	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 	scene.add(camera);
-	camera.position.set(0,1500,100);
-	camera.rotation.set(-0.673455,-0.537573,-0.387867) 
+	camera.position.set(0,0,-10);
+	// camera.rotation.set(-0.673455,-0.537573,-0.387867) 
 	camera.updateProjectionMatrix();
 
 
@@ -225,11 +227,11 @@ function init()
 	// FLOOR
 	//2100 1400
 	var floorMaterial = new THREE.MeshBasicMaterial( {color:0x666666, side:THREE.DoubleSide} );
-	var floorGeometry = new THREE.PlaneGeometry(conf.dimensions.x,conf.dimensions.y, 1, 1);
+	var floorGeometry = new THREE.PlaneGeometry(conf.dimensions.x/10,conf.dimensions.y/10, 1, 1);
 	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
 	floor.position.y = -0.5;
-	floor.position.z = 700;
-	floor.position.x = 1050;
+	floor.position.z = conf.dimensions.y/10/2;
+	floor.position.x = conf.dimensions.x/10/2;
 	floor.rotation.x = Math.PI / 2;
 	scene.add(floor);
 
@@ -238,9 +240,13 @@ function init()
 
 
 	// SKYBOX/FOG
-	var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
+	var skyBoxGeometry = new THREE.CubeGeometry( 20000/10, 20000/10, 10000/10 );
 	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
 	var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
+	skyBox.position.y = -0.5;
+	skyBox.position.z = conf.dimensions.y/10/2;
+	skyBox.position.x = conf.dimensions.x/10/2;
+	skyBox.rotation.x = Math.PI / 2;
 	scene.add(skyBox);
 	
 	////////////
@@ -289,7 +295,11 @@ function init()
 	}
 	
 
-	
+	sendMqtt("/hardcontroller_publish_all/10001","");
+	sendMqtt("/hardcontroller_publish_all/10002","");
+	sendMqtt("/hardcontroller_publish_all/10003","");
+	sendMqtt("/hardcontroller_publish_all/10004","");
+
 
 	
 }
@@ -333,7 +343,7 @@ function calculateSoundDistances(sound_id){
 			speakerDistances.push(dist);
 
 			// Calculate gains
-			var gain = mapValues(dist,0, 500, 1, 0);
+			var gain = mapValues(dist,0, 100, 1, 0);
 			if(gain < 0){
 				gain = 0;
 			}
@@ -557,7 +567,7 @@ function parseMqtt(topic, message){
 
 
   	console.log(topic[2]+""+topic[3] + message);
-  		spaceChangeSoundShape(topic[2],topic[3],message);
+  		spaceChangeSoundShape(topic[2]-1,topic[3],message);
 
 
   }
@@ -568,19 +578,23 @@ function parseMqtt(topic, message){
 
 function spaceChangeSoundShape(i,param,value){
 
+	if(!soundOrbits[i]){
+		console.log("Soundorbit" + i + " is not defined");
+		return false;
+	}
 	if(param=="POS_X"){
     	// soundShapes[i].position.x = mapValues(value,0,1,0,conf.dimensions.x);
-    	soundOrbits[i].line.position.x =  mapValues(value,0,255,0,conf.dimensions.x);
+    	soundOrbits[i].line.position.x =  mapValues(value,0,255,0,conf.dimensions.x/10);
     	soundOrbits[i].changed = true;
 
 	} else if(param=="POS_Y"){
     	// soundShapes[i].position.z = mapValues(value,0,1,0,conf.dimensions.y);
-    	soundOrbits[i].line.position.z =  mapValues(value,0,255,0,conf.dimensions.y);
+    	soundOrbits[i].line.position.z =  mapValues(value,0,255,0,conf.dimensions.y/10);
     	soundOrbits[i].changed = true;
 
-	} else if(param=="POS_Z"){
+	} else if(param=="POS_Z_"){ // not used
     	// soundShapes[i].position.y = mapValues(value,0,1,0,conf.dimensions.z);
-    	soundOrbits[i].line.position.y =  mapValues(value,0,255,0,conf.dimensions.z);
+    	soundOrbits[i].line.position.y =  mapValues(value,0,255,conf.dimensions.z/10,0);
     	soundOrbits[i].changed = true;
 
 	} else if(param=="SHAPE_WIDTH"){
@@ -589,22 +603,22 @@ function spaceChangeSoundShape(i,param,value){
 	} else if(param=="SHAPE_LENGTH"){
     	soundShapes[i].scale.z = mapValues(value,0,255,0.0001,5, false,4);
 
-	} else if(param=="SHAPE_HEIGHT"){
+	} else if(param=="SHAPE_HEIGHT_"){ // not used
     	soundShapes[i].scale.y = mapValues(value,0,255,0.0001,5, false,4);
 
-	} else if(param=="SHAPE_BLUR"){
-    	console.log("no shape blur yet!");
+	} else if(param=="SHAPE_BLUR_"){ // not used
+    	//console.log("no shape blur yet!");
 
 	} else if(param=="ORBIT_WIDTH"){
-		soundOrbits[i].line.scale.x = mapValues(value,0,255,0.0001,5, false,4);
+		soundOrbits[i].line.scale.x = mapValues(value,0,255,0.0001,1, false,4);
 		soundOrbits[i].changed = true;
     	// soundOrbits[i].line.scale.x = mapValues(value,0,1,0,5);
 
 	} else if(param=="ORBIT_LENGTH"){
-		soundOrbits[i].line.scale.y = mapValues(value,0,255,0.0001,5, false,4);
+		soundOrbits[i].line.scale.y = mapValues(value,0,255,0.0001,1, false,4);
 		soundOrbits[i].changed = true;
 
-	} else if(param=="ORBIT_ROTATE"){
+	} else if(param=="ORBIT_ROTATE_"){
 		soundOrbits[i].line.rotation.x = mapValues(value,0,255,0,degrees_to_radians(360),false,5);
 		soundOrbits[i].changed = true;
 	} else if(param=="ORBIT_SPEED"){
@@ -652,6 +666,8 @@ setInterval(function(){
 			soundShapes[i].positionChanged = 0;
 
 			// soundSendSpeakers(i,soundShapes[i].gains);
+
+			soundShapes[i].gains.unshift(i+1);
 
 			sendMqtt("/speaker_gains/"+i,  soundShapes[i].gains.join(" "));
 

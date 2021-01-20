@@ -23,6 +23,7 @@
 
 		<script type="text/javascript" src="../common/js/conf.js"></script>
 		<script type="text/javascript" src="../common/js/functions.js"></script>
+		<script type="text/javascript" src="../space/lights.js"></script>
 
 
 		<style type="text/css">
@@ -32,6 +33,8 @@
 				min-height: 100%;
 				margin: 0;
 				padding: 0;
+				background: black;
+				color: white;
 			}
 
 
@@ -56,6 +59,48 @@
 				color: white;
 			}
 
+			#backgrounds{
+				width:100vw;
+			}
+
+			.background{
+				width: 20vw;
+				height: 50vh;
+				float: left;
+				padding: 2.5vw;
+			}
+
+			#players{
+				width:100vw;
+				height: 15vw;
+			}
+
+			.background_icon{
+				  background: conic-gradient(
+				  red 36deg, orange 36deg 170deg, yellow 170deg);
+				  border-radius: 50%;
+				  width: 20vw;
+				  height: 20vw;
+				   -webkit-filter: blur(0em);
+
+			}
+
+			
+@-webkit-keyframes rotating {
+    from{
+        -webkit-transform: rotate(0deg);
+    }
+    to{
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+.rotating {
+    -webkit-animation: rotating 2s linear infinite;
+}
+
+			.player{float:left;}
+
 
 		</style>
 
@@ -65,9 +110,15 @@
 
 <div id="header">Wavespace Space/ MAAJAAM STUDIO</div>
 
-<p><input type="checkbox" id="mqtt_update"> Update controls from MQTT?</p>
+<div id="players">
+	<p><input type="checkbox" id="mqtt_update"> Update controls from MQTT?</p>
 
-<div id="players"></div>
+</div>
+
+
+<div id="backgrounds"></div>
+
+
   
 <div id="message"></div>
 

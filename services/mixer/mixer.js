@@ -10,15 +10,15 @@ var colors = require('colors');
 
 
 var mqtt_prepend = "wavespace";
-var mqtt_server = "192.168.1.59";
+var mqtt_server = "wavespace.local";
 var mqtt_user = ""
 var mqtt_pass = ""
 
 var conf = {}
 conf.launchPd = true;
 conf.pdNoGui = false;
-conf.pdAudioApi = "pajack"
-conf.pdBin = "";
+conf.pdAudioApi = "jack"
+conf.pdBin = "/usr/bin/puredata";
 
 console.log("Started");
 

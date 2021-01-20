@@ -16,6 +16,12 @@ for (var i = 0; i < conf.maxPlayers; i++) {
 	  createPlayer(i);
 }
 
+  sendMqtt("/hardcontroller_publish_all/10001", "")
+  sendMqtt("/hardcontroller_publish_all/10002", "")
+  sendMqtt("/hardcontroller_publish_all/10003", "")
+  sendMqtt("/hardcontroller_publish_all/10004", "")
+
+
 
 
 });
@@ -62,17 +68,23 @@ function parseMqtt(topic, message){
           players[controller].dial_shape_blur.value = message;
       } else if(key=="VOLUME"){
           players[controller].dial_volume.value = message;
+      } else if(key=="TAG_ON"){
+          players[controller].tag.value = message;
+      } else if(key=="TAG_OFF"){
+          players[controller].tag.value = '';
       }
+
     console.log(message);
   } else if(topic[1]=="speaker_gains"){
     
      if(topic[2]>=1 && topic[2]<=4 ){
       var controller = topic[2]-1;
+             players[controller].multislider.setAllSliders(message.split(" "));
+
     } 
 
     console.log(message);
 
-       players[controller].multislider.setAllSliders(message.split(" "));
 
   }
 
@@ -134,12 +146,12 @@ function createPlayer(i){
       <div class="dial_header">POSITION</div>
       <div id="pos${i}" class="pos"></div>
 
+      <div class="dial_header">ORBIT</div>
+      <div id="orbit${i}" class="orbit"></div>
+
       <div class="dial_header">SHAPE</div>
       <div id="shape${i}" class="shape"></div>
 
-      <div class="dial_header">ORBIT</div>
-      <div id="orbit${i}" class="orbit"></div>
-      
       <hr/>
       <div class="dial_header">MONITOR</div>
 
@@ -190,9 +202,9 @@ function createPlayer(i){
     /////////////////////////////////////////////////////////////////////////////////////
     // SOUND
 
-    var select = new Nexus.Select('#sound'+i,{
+    players[i].tag = new Nexus.Select('#sound'+i,{
       'size': [250,30],
-      'options': ['-','tag1','tag2']
+      'options': ['','04-C0-C7-7A-E0-60-80','04-33-C2-7A-E0-60-80','04-A1-C5-7A-E0-60-80','04-18-C8-7A-E0-60-81']
     })
 
     /////////////////////////////////////////////////////////////////////////////////////

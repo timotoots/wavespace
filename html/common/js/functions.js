@@ -4,20 +4,27 @@
 
 // MQTT
 
-var client  = mqtt.connect("ws://"+conf.mqtt_ip+":1884",conf.mqtt_settings)
+ var client;
+  client  = mqtt.connect("ws://"+conf.mqtt_ip+":1884",conf.mqtt_settings)
 
-client.on('connect', function () {
+setTimeout(function(){
 
-  client.publish(conf.mqtt_prepend + '/' + SCRIPT_NAME, SCRIPT_NAME + "started");
-  for (var i = 0; i < subscribe_topics.length; i++) {
-    client.subscribe(conf.mqtt_prepend + subscribe_topics[i], function (err) {}) 
-  }
 
-});
+  client.on('connect', function () {
 
-client.on('message', function (topic, message) {
-  parseMqtt(topic, message.toString());
-});
+    client.publish(conf.mqtt_prepend + '/' + SCRIPT_NAME, SCRIPT_NAME + "started");
+    for (var i = 0; i < subscribe_topics.length; i++) {
+      client.subscribe(conf.mqtt_prepend + subscribe_topics[i], function (err) {}) 
+    }
+
+  });
+
+  client.on('message', function (topic, message) {
+    parseMqtt(topic, message.toString());
+  });
+
+},10);
+
 
 function sendMqtt(topic, value){
 
