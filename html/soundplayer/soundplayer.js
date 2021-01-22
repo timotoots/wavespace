@@ -17,11 +17,13 @@ conf.maxPlayers = 8;
 ////////////////////////////////////////////////////////////////////////
 
 var currentBackground = -1;
+var backgroundStatus = "stopped";
 
 var backgrounds = []
 
 
 // https://coolors.co
+
 
 var out = {
   'name':'Test 0+1+2+3',
@@ -81,6 +83,7 @@ var out = {
 
 backgrounds.push(out);
 
+
 ///////////////////////////////////////
 
 var out = {
@@ -88,10 +91,10 @@ var out = {
   'colors':["258ea6","549f93","9faf90","e2b1b1","e2c2ff"],
   'status':'stopped',
   'sounds':{
-    'taustad/1/1.wav':1,
-    'taustad/1/2.wav':2,
-    'taustad/1/3.wav':4,
-    'taustad/1/4.wav':0
+    'taustad_v2/taust1/1.wav':1,
+    'taustad_v2/taust1/2.wav':2,
+    'taustad_v2/taust1/3.wav':4,
+    'taustad_v2/taust1/4.wav':0
   }
 }
 
@@ -104,10 +107,10 @@ var out = {
   'colors':["cee0dc","b9cfd4","afaab9","b48291","a5243d"],
   'status':'stopped',
   'sounds':{
-    'taustad/2/1.wav':1,
-    'taustad/2/2.wav':2,
-    'taustad/2/3.wav':4,
-    'taustad/2/4.wav':0
+    'taustad_v2/taust2/1.wav':1,
+    'taustad_v2/taust2/2.wav':2,
+    'taustad_v2/taust2/3.wav':4,
+    'taustad_v2/taust2/4.wav':0
   }
 }
 
@@ -121,14 +124,33 @@ var out = {
   'colors':["e08dac","6a7fdb","57e2e5","45cb85","153131"],
   'status':'stopped',
   'sounds':{
-    'taustad/3/1.wav':1,
-    'taustad/3/2.wav':2,
-    'taustad/3/3.wav':4,
-    'taustad/3/4.wav':0
+    'taustad_v2/taust3/1.wav':1,
+    'taustad_v2/taust3/2.wav':2,
+    'taustad_v2/taust3/3.wav':4,
+    'taustad_v2/taust3/4.wav':0
   }
 }
 
 backgrounds.push(out);
+
+///////////////////////////////////////
+
+var out = {
+  'name':'SCAPE4',
+  'colors':["f4e409","eeba0b","c36f09","a63c06","710000"],
+  'status':'stopped',
+  'sounds':{
+    'taustad_v2/taust4/1.wav':1,
+    'taustad_v2/taust4/2.wav':2,
+    'taustad_v2/taust4/3.wav':4,
+    'taustad_v2/taust4/4.wav':0
+  }
+}
+
+backgrounds.push(out);
+
+
+
 function playBackground(i){
 
   if(currentBackground!=i){
@@ -164,15 +186,48 @@ function playBackground(i){
 
     $("#background_icon" + i).addClass("rotating");
 
+    
+    changeLed(1,"00000080");
+
+
     for(var light_id in backgrounds[i].lights){
-      console.log(light_id);
        changeLed(light_id,backgrounds[i].lights[light_id]);
     }
 
 
 
+    // when clicked on active one
+  } else {
 
-  } // if
+    for (var  k= 0; k < backgrounds.length; k++) {
+      $("#background_icon" + k).removeClass("rotating");
+    }
+
+    var player_id = 4;
+    for(var file in backgrounds[i].sounds){
+
+      players[player_id].audioElement.src = "";
+
+      var msg = [player_id+1];
+
+      for (var j = 0; j < conf.speakers.length; j++) {
+        
+           if(j==backgrounds[i].sounds[file] || j==15){
+              msg.push(0);
+            } else {
+              msg.push(0);
+            } 
+      }
+
+      sendMqtt("/speaker_gains/"+player_id,  msg.join(" "));
+
+      player_id++;
+
+    } // for 
+
+    currentBackground = -1;
+
+  }
 
 
 }
@@ -233,12 +288,9 @@ function createBackground(i){
 
     div.insertAdjacentHTML('afterbegin',`
 
-<div class="background_icon" style="${wheel}"  id="background_icon${i}"></div>
+      <div class="background_icon" style="${wheel}"  id="background_icon${i}"></div>
       <div class="main_header" id="header${i}">${backgrounds[i].name}</div>
-      <hr/>
-      <a href=""></a>
-
-      <hr/>
+     
 
       `);
 
@@ -259,67 +311,58 @@ function parseMqtt(topic, message){
 
 
   topic = topic.split("/");
-  console.log(topic);
 
-  if(topic[1]=="softcontroller" && topic[2]>0 &&  topic[2]<4 && topic[3]){ //  && document.getElementById('mqtt_update').checked==true
+  if(topic[1]=="hardcontroller" && topic[2]>=1 && topic[2]<=4 && topic[3]){ //  && document.getElementById('mqtt_update').checked==true
 
       var now = new Date().getTime();
 
+      var controller = topic[2]-1
+
+      // if(topic[3]=="PAUSE"){
 
 
-    if( topic[2]==1){
-      var controller = 0;
-      if(now - last_paused_1 < 1000 && topic[3]=="PAUSE"){
-          return false;
-      }
-
-        last_paused_1 = now;
-    } else if(topic[2]=="2" ){
-      var controller = 1;
-      if(now - last_paused_2 < 1000  && topic[3]=="PAUSE"){
-          return false;
-      }
-       last_paused_2 = now;
-
-          } else if(topic[2]=="3" ){
-      var controller = 2;
- 
-       if(now - last_paused_3 < 1000  && topic[3]=="PAUSE"){
-          return false;
-      }
-
-      last_paused_3 = now;
-
-         } else if(topic[3]=="4" ){
-      var controller = 3;
- 
-       if(now - last_paused_4 < 1000  && topic[3]=="PAUSE"){
-          return false;
-      }
-       last_paused_4 = now;
-
-         }
-
-      if(topic[3]=="PAUSE"){
+      //   if (players[controller].audioElement.duration > 0 && !players[controller].audioElement.paused ) {
+      //       players[controller].audioElement.pause();
+      //       console.log("Pause player" + (controller+1));
+      //   } else {
+      //       players[controller].audioElement.play();
+      //       console.log("Play player" + (controller+1));
+      //   }
 
 
-        if (players[controller].audioElement.duration > 0 && !players[controller].audioElement.paused ) {
-            players[controller].audioElement.pause();
-            console.log("Pause player" + (controller+1));
-        } else {
-            players[controller].audioElement.play();
-            console.log("Play player" + (controller+1));
-        }
+      // }  else 
+
+      if(topic[4]=="POS_Z"){
+
+          players[controller].audioElement.volume = mapValues(message,255, 0, 0, 1);
 
 
-      }  else if(topic[3]=="VOLUME"){
+      } else if(topic[4]=="TAG_ON"){
 
-          players[controller].audioElement.volume = mapValues(message,0, 255, 0, 1);
+          console.log("Play player " + controller+": " + message);
+          players[controller].audioElement.src = "../data/linkid_v1/" + message + ".wav"
+          players[controller].audioElement.play();
+
+          var ledColors = {};
+          ledColors[0] = "100 0 0";
+          ledColors[1] = "0 100 0";
+          ledColors[2] = "0 0 100";
+          ledColors[3] = "100 100 0";
+         
+
+           sendMqtt("/set_controller/"+ (controller+10001) + "/led/0",  ledColors[controller]+" 0" );
+
+                    // set_controller
 
 
-      } else if(topic[3]=="tag_on"){
 
-          players[controller].audioElement.volume = mapValues(message,0, 255, 0, 1);
+      } else if(topic[4]=="TAG_OFF"){
+
+          console.log("Stop player " + controller);
+          players[controller].audioElement.src = ""
+          players[controller].audioElement.pause();
+
+          sendMqtt("/set_controller/"+ (controller+10001) + "/led/0",  "0 0 0 0" );
 
 
       }

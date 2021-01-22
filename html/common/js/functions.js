@@ -4,6 +4,7 @@
 
 // MQTT
 
+
  var client;
   client  = mqtt.connect("ws://"+conf.mqtt_ip+":1884",conf.mqtt_settings)
 
@@ -29,7 +30,7 @@ setTimeout(function(){
 function sendMqtt(topic, value){
 
   topic = conf.mqtt_prepend + topic;
-  console.log("[MQTT] Send to topic " + topic + ", value: '" + value + "'")
+  // console.log("[MQTT] Send to topic " + topic + ", value: '" + value + "'")
   client.publish(topic, value)
 
 }
@@ -53,6 +54,16 @@ function mapValues(value,in_min, in_max, out_min, out_max, rounded = false, deci
   
 }
 
+function doc_keyUp(e) {
+
+  console.log(e.keyCode);
+    // this would test for whichever key is 40 and the ctrl key at the same time
+    if (e.keyCode == 68) {
+        // call your function to do the thing
+        $("#debug").toggle();
+    }
+}
+document.addEventListener('keyup', doc_keyUp, false);
 
 
 

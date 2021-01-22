@@ -60,11 +60,13 @@ function createSoundshape(id){
 
 
 	soundShapes[id] = new THREE.Mesh(wallGeometry, wallMaterial);
-	soundShapes[id].position.set(100+id*100, 50, -100+id*100);
+	soundShapes[id].position.set(100+id*100, 100, -100+id*100);
 	soundShapes[id].shapeType = "sound";
 	soundShapes[id].name = id;
 	soundShapes[id].lastPosition = [0,0,0]//{"x":0,"y":0,"z":0};
 	soundShapes[id].positionChanged = 0;
+	soundShapes[id].playing = false;
+	soundShapes[id].volume = 0;
 
 
 
@@ -77,6 +79,9 @@ function createSoundshape(id){
 	// Create orbit
 
 	soundOrbits[id] = {};
+
+	soundOrbits[id].move_x = 0;
+	soundOrbits[id].move_y = 0;
 
 	changeOrbit(id,"ellipse");
 
@@ -144,11 +149,17 @@ function createSpeaker(id){
 	var cubeGeometry = new THREE.BoxBufferGeometry( 10, 120, 60 );
 	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x424141 } );
 	speakers[id] = new THREE.Mesh( cubeGeometry, wireMaterial );
-	speakers[id].position.set(conf.speakers[id][1]/10,100,conf.speakers[id][2]/10);
-	speakers[id].shapeType = "speaker";
+	speakers[id].position.set(conf.speakers[id][1]/10,100,680-conf.speakers[id][2]/10);
+	if(conf.speakers[id][3]=="sub"){
+		speakers[id].shapeType = "sub";
+	} else {
+		speakers[id].shapeType = "speaker";
+	}
+	
 	speakers[id].name = id;
 	speakers[id].brightness = [];
-	speakers[id].material.color  = new THREE.Color("rgb(0, 0, 0)");
+	speakers[id].colors = [0,0,0,0];
+	speakers[id].material.color  = new THREE.Color("rgb(100, 100, 100)");
 	scene.add( speakers[id] );	
 	
 }
@@ -183,12 +194,14 @@ function init()
 	scene = new THREE.Scene();
 	// CAMERA
 	var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+	var SCREEN_WIDTH = 1280;
+	var SCREEN_HEIGHT = 800;
 	console.log(SCREEN_WIDTH);
 	var VIEW_ANGLE = 75, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 30000;
 	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 	scene.add(camera);
-	camera.position.set(0,0,-10);
-	// camera.rotation.set(-0.673455,-0.537573,-0.387867) 
+	camera.position.set(conf.dimensions.x/10/2+1050,600,conf.dimensions.y/10/2);
+	camera.rotation.set(0,0,90) 
 	camera.updateProjectionMatrix();
 
 
@@ -212,6 +225,7 @@ function init()
 	controls.enablePan = false;
 
 	// STATS
+	/*
 	stats = new Stats();
 	stats.dom.style.position = 'absolute';
 	stats.dom.style.zIndex = 100;
@@ -219,6 +233,8 @@ function init()
 	stats.dom.style.bottom = '0px';
 
 	container.appendChild( stats.dom );
+	*/
+
 	// LIGHT
 	var light = new THREE.PointLight(0xffffff);
 	light.position.set(0,250,0);
@@ -237,11 +253,12 @@ function init()
 
 
 	controls.target = new THREE.Vector3(floor.position.x ,0,floor.position.z) ;
+	controls.target = new THREE.Vector3(conf.dimensions.x/10/2+200,0,conf.dimensions.y/10/2) ;
 
 
 	// SKYBOX/FOG
 	var skyBoxGeometry = new THREE.CubeGeometry( 20000/10, 20000/10, 10000/10 );
-	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
+	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x272727, side: THREE.BackSide } );
 	var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 	skyBox.position.y = -0.5;
 	skyBox.position.z = conf.dimensions.y/10/2;
@@ -280,11 +297,24 @@ function init()
 	// CUSTOM //
 	////////////	
 
-	var cubeGeometry = new THREE.CubeGeometry(50,50,50,1,1,1);
-	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe:true } );
-	MovingCube = new THREE.Mesh( cubeGeometry, wireMaterial );
-	MovingCube.position.set(0, 25.1, 0);
-	scene.add( MovingCube );
+	// YOU ARE HERE
+
+
+	const geometry = new THREE.SphereGeometry( 60, 60, 60 );
+	const material = new THREE.MeshBasicMaterial( {color: 0xff0000, wireframe:true} );
+	const sphere = new THREE.Mesh( geometry, material );
+	sphere.position.set(8210/10,60,680-4250/10);
+
+
+
+	scene.add( sphere );
+
+
+	// var cubeGeometry = new THREE.CubeGeometry(90,90,60,1,1,1);
+	// var wireMaterial = new THREE.MeshBasicMaterial( { color: 0xF85B06, wireframe:false } );
+	// MovingCube = new THREE.Mesh( cubeGeometry, wireMaterial );
+	// MovingCube.position.set(821, 45, 425);
+	// scene.add( MovingCube );
 	
 	for (var i = 0; i < conf.maxPlayers; i++) {
 		createSoundshape(i);
@@ -328,7 +358,7 @@ function calculateSoundDistances(sound_id){
 
 	var curPos = [ soundShapes[sound_id].position.x,soundShapes[sound_id].position.y,soundShapes[sound_id].position.z];
 
-	if(soundShapes[sound_id].lastPosition[0] != curPos[0] || soundShapes[sound_id].lastPosition[1] != curPos[1] || soundShapes[sound_id].lastPosition[2] != curPos[2]){
+	if( soundShapes[sound_id].lastPosition[0] != curPos[0] || soundShapes[sound_id].lastPosition[1] != curPos[1] || soundShapes[sound_id].lastPosition[2] != curPos[2]){
 
 		var boundingBox = new THREE.Box3();
 		boundingBox.copy( soundShapes[sound_id].geometry.boundingBox ).applyMatrix4( soundShapes[sound_id].matrixWorld );
@@ -344,14 +374,32 @@ function calculateSoundDistances(sound_id){
 
 			// Calculate gains
 			var gain = mapValues(dist,0, 100, 1, 0);
-			if(gain < 0){
+			if(gain < 0 || soundShapes[sound_id].playing==false ){
 				gain = 0;
 			}
+			if(speakers[i].shapeType=="sub"){
+				gain = 1;
+			}
+
 			gains.push(gain);
+
+			if(speakers[i].shapeType!="sub"){
 
 			// Calculate 3D speaker brighness
 			var brightness = mapValues(gain,0, 1, 0, 255, true);
-			speakers[i].material.color  = new THREE.Color('rgb('+brightness+'%, '+brightness+'%, '+brightness+'%)');
+			// brightness = 0;
+			// speakers[i].material.color  = new THREE.Color('rgb('+brightness+'%, '+brightness+'%, '+brightness+'%)');
+			speakers[i].colors[sound_id] = Math.round(brightness * soundShapes[sound_id].volume);
+
+
+			updateSpeakerColors(i);	
+
+			}
+
+
+			if(speakers[i].shapeType=="sub"){
+				 speakers[i].material.opacity = 0;
+			}
 
 		}
 
@@ -365,6 +413,65 @@ function calculateSoundDistances(sound_id){
 
 
 	} 
+
+}
+
+function updateSpeakerColors(i){
+
+
+		if(speakers[i].shapeType=="sub"){
+				 speakers[i].visible = false
+
+			} else {
+				var brightness = Math.max(speakers[i].colors[0],speakers[i].colors[1],speakers[i].colors[2],speakers[i].colors[3]);
+				speakers[i].material.color = new THREE.Color('rgb('+brightness+'%, '+brightness+'%, '+brightness+'%)');
+
+			}
+	
+	
+		/*
+		var color_r = new THREE.Color('rgb('+speakers[i].colors[0]+'%, 0%, 0%)');
+		var color_g = new THREE.Color('rgb(0%, '+speakers[i].colors[1]+'%, 0%)');
+		var color_b = new THREE.Color('rgb(0%, 0%, '+speakers[i].colors[2]+'%)');
+		var color_y = new THREE.Color('rgb('+speakers[i].colors[3]+'%, '+speakers[i].colors[3]+'%, 0%)');
+
+
+			var material = new THREE.ShaderMaterial({
+			  uniforms: {
+			    color1: {
+			      value: color_r
+			    },
+			    color2: {
+			      value: color_g
+			    }
+			  },
+			  vertexShader: `
+			    varying vec2 vUv;
+
+			    void main() {
+			      vUv = uv;
+			      gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+			    }
+			  `,
+			  fragmentShader: `
+			    uniform vec3 color1;
+			    uniform vec3 color2;
+			  
+			    varying vec2 vUv;
+			    
+			    void main() {
+			      
+			      gl_FragColor = vec4(mix(color1, color2, vUv.y), 1.0);
+			    }
+			  `,
+			  wireframe: false
+			});
+
+	console.log(speakers[i].colors);
+
+		speakers[i].material = material;
+*/
+
 
 }
 
@@ -433,7 +540,30 @@ function update(){
 		soundOrbits[id].line.rotation.set(degrees_to_radians(90), 0, 0);
 		*/
 
+
+    
+
+
 		for (var id = 0; id < soundOrbits.length; id++) {
+
+			if(soundOrbits[id].move_y != 0 ){
+				var new_pos = soundOrbits[id].line.position.x + soundOrbits[id].move_y;
+				if(new_pos > -20 && new_pos < conf.dimensions.x/10+20){
+					soundOrbits[id].line.position.x = new_pos;
+	    			soundOrbits[id].changed = true;
+				}
+				
+			}
+
+			if(soundOrbits[id].move_x != 0 ){
+				var new_pos = soundOrbits[id].line.position.z + soundOrbits[id].move_x;
+				if(new_pos > -20 && new_pos < conf.dimensions.y/10+20){
+					soundOrbits[id].line.position.z = new_pos;
+	    			soundOrbits[id].changed = true;
+				}
+				
+			}			
+
 			if(soundOrbits[id].changed){
 				calculateNewOrbitCurve(id)
 			}
@@ -451,7 +581,7 @@ function update(){
 			var pos = soundOrbits[id].alteredCurve.getPointAt(t);
 			soundShapes[id].position.x = pos.x;
 			soundShapes[id].position.z = pos.z;
-			soundShapes[id].position.y = pos.y;
+			// soundShapes[id].position.y = pos.y;
 
 		}
 
@@ -524,7 +654,7 @@ function update(){
 	*/
 
 	controls.update();
-	stats.update();
+	// stats.update();
 }
 
 function render() 
@@ -563,16 +693,16 @@ function parseMqtt(topic, message){
 
   
 
-  if(topic[2]>0 && topic[2]<5 &&  topic[3]){
+  if(topic[2]>=1 && topic[2]<=4 &&  topic[4]){
 
 
-  	console.log(topic[2]+""+topic[3] + message);
-  		spaceChangeSoundShape(topic[2]-1,topic[3],message);
+  	// console.log(topic[2]+""+topic[4] + message);
+  		spaceChangeSoundShape(topic[2]-1,topic[4],message);
 
 
   }
 
-  console.log(topic);
+  // console.log(topic);
 
   }
 
@@ -582,26 +712,59 @@ function spaceChangeSoundShape(i,param,value){
 		console.log("Soundorbit" + i + " is not defined");
 		return false;
 	}
-	if(param=="POS_X"){
+	if(param=="POS_Y"){
+
+		if(value>127-30 && value < 127+30){
+			soundOrbits[i].move_y = 0;
+		} else if(value > 130 ){
+			soundOrbits[i].move_y = mapValues(value,130,255,-0,-10);
+		} else if(value < 120 ){
+			soundOrbits[i].move_y = mapValues(value,0,120,10,0);
+		}
+
     	// soundShapes[i].position.x = mapValues(value,0,1,0,conf.dimensions.x);
-    	soundOrbits[i].line.position.x =  mapValues(value,0,255,0,conf.dimensions.x/10);
-    	soundOrbits[i].changed = true;
 
-	} else if(param=="POS_Y"){
+
+	} else if(param=="POS_X"){
+
+		if(value>127-30 && value < 127+30){
+			soundOrbits[i].move_x = 0;
+		} else if(value > 130 ){
+			soundOrbits[i].move_x = mapValues(value,130,255,0,-10);
+		} else if(value < 120 ){
+			soundOrbits[i].move_x = mapValues(value,0,120,10,0);
+		}
+
+
     	// soundShapes[i].position.z = mapValues(value,0,1,0,conf.dimensions.y);
-    	soundOrbits[i].line.position.z =  mapValues(value,0,255,0,conf.dimensions.y/10);
-    	soundOrbits[i].changed = true;
+    	// soundOrbits[i].line.position.z =  mapValues(value,0,255,conf.dimensions.y/10,0);
+    	// soundOrbits[i].changed = true;
 
-	} else if(param=="POS_Z_"){ // not used
+	} else if(param=="POS_Z"){ // not used
+
+		// volume
+		soundShapes[i].volume = mapValues(value,255,0,0,1)
+		soundShapes[i].material.opacity = mapValues(value,255,0,0,0.8);
+
     	// soundShapes[i].position.y = mapValues(value,0,1,0,conf.dimensions.z);
-    	soundOrbits[i].line.position.y =  mapValues(value,0,255,conf.dimensions.z/10,0);
-    	soundOrbits[i].changed = true;
+    	// soundOrbits[i].line.position.y =  mapValues(value,0,255,conf.dimensions.z/10,0);
+    	// soundOrbits[i].changed = true;
 
 	} else if(param=="SHAPE_WIDTH"){
-    	soundShapes[i].scale.x = mapValues(value,0,255,0.0001,5, false,4);
+    	soundShapes[i].scale.x = mapValues(value,0,255,0.3,6, false,4);
+
+	} else if(param=="TAG_ON"){
+		soundShapes[i].playing = true;
+    	soundShapes[i].material.opacity = 0.5;
+    	soundOrbits[i].line.material.opacity = 1;
+
+	}  else if(param=="TAG_OFF"){
+		soundShapes[i].playing = false;
+    	soundShapes[i].material.opacity = 0;
+    	soundOrbits[i].line.material.opacity = 0;
 
 	} else if(param=="SHAPE_LENGTH"){
-    	soundShapes[i].scale.z = mapValues(value,0,255,0.0001,5, false,4);
+    	soundShapes[i].scale.z = mapValues(value,0,255,0.3,6, false,4);
 
 	} else if(param=="SHAPE_HEIGHT_"){ // not used
     	soundShapes[i].scale.y = mapValues(value,0,255,0.0001,5, false,4);

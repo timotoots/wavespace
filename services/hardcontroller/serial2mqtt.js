@@ -16,6 +16,35 @@ let monkey = NodeMonkey({
   },
 })
 
+var tags = {};
+
+tags["04-FF-C7-7A-E0-60-80"] = "macondo";
+tags["04-F7-C7-7A-E0-60-80"] = "cockaigne";
+tags["04-F0-C6-7A-E0-60-80"] = "lytreia";
+tags["04-E8-C5-7A-E0-60-80"] = "lituania";
+tags["04-CF-C5-7A-E0-60-80"] = "pentixore";
+tags["04-C7-C5-7A-E0-60-80"] = "luquebaralideaux";
+tags["04-C0-C4-7A-E0-60-80"] = "spensonia";
+tags["04-B9-C3-7A-E0-60-80"] = "meccainia";
+tags["04-B1-C3-7A-E0-60-80"] = "euphonia";
+tags["04-A9-C3-7A-E0-60-80"] = "sarragalla";
+tags["04-A1-C3-7A-E0-60-80"] = "fionavar";
+tags["04-99-C3-7A-E0-60-80"] = "papefiguiera";
+tags["04-91-C3-7A-E0-60-80"] = "maina";
+tags["04-89-C3-7A-E0-60-80"] = "antagil";
+tags["04-81-C3-7A-E0-60-80"] = "butua";
+tags["04-79-C2-7A-E0-60-80"] = "aphania";
+tags["04-71-C2-7A-E0-60-80"] = "junganyika";
+tags["04-6A-C3-7A-E0-60-80"] = "ewaipanoma";
+tags["04-0F-C7-7A-E0-60-81"] = "monomotapa";
+tags["04-1A-BF-7A-E0-60-80"] = "bampopo";
+tags["04-80-C5-7A-E0-60-80"] = "misnie";
+tags["04-88-C5-7A-E0-60-80"] = "centrum_terrae";
+tags["04-F7-C8-7A-E0-60-80"] = "kravonia";
+tags["04-3C-C2-7A-E0-60-80"] = "milosis";
+tags["04-98-C5-7A-E0-60-80"] = "portiuncula";
+
+
 /////////////////////////////////////////////////
 
 var serial_ports = [
@@ -141,7 +170,12 @@ function onTag(reader_id, tag_id){
 
 	tagReaders[reader_id].updated = new Date().getTime();
 	if(tagReaders[reader_id].tag != tag_id){
-		sendMqtt("/hardcontroller/"+reader_id+"/pot/TAG_ON", tag_id);
+        if(tags[tag_id]){
+            var out = tags[tag_id];
+        } else {
+            var out = tag_id;
+        }
+		sendMqtt("/hardcontroller/"+reader_id+"/pot/TAG_ON", out);
 		tagReaders[reader_id].tag = tag_id;
 	} 
 

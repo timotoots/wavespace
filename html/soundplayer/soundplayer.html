@@ -35,19 +35,19 @@
 				padding: 0;
 				background: black;
 				color: white;
-			}
-
-
-			#three_canvas {
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 1920px;
-				z-index: 9;
-				height: 1080px;
+				font-family: Courier;
 				overflow: hidden;
 
+			}
 
+			body{
+				cursor: none; 
+			}
+
+			.main_header {
+				margin-top: 10px;
+				text-align: center;
+				opacity: 0;
 			}
 
 			#header{
@@ -65,9 +65,10 @@
 
 			.background{
 				width: 20vw;
-				height: 50vh;
+				height: 40vh;
 				float: left;
 				padding: 2.5vw;
+				margin-top: 1.5vw;
 			}
 
 			#players{
@@ -83,6 +84,10 @@
 				  height: 20vw;
 				   -webkit-filter: blur(0em);
 
+			}
+
+			#debug{
+				display: none;
 			}
 
 			
@@ -108,21 +113,26 @@
 
 <body>
 
-<div id="header">Wavespace Space/ MAAJAAM STUDIO</div>
+	<div id="header">Linkispace-2 AMBIENCE / MAAJAAM STUDIO</div>
 
-<div id="players">
-	<p><input type="checkbox" id="mqtt_update"> Update controls from MQTT?</p>
+
+<div id="debug">
+
+	<div id="players">
+		<p><input type="checkbox" id="mqtt_update"> Update controls from MQTT?</p>
+
+	</div>
+	<div id="message"></div>
 
 </div>
 
-
 <div id="backgrounds"></div>
-
-
   
-<div id="message"></div>
 
 <script type="text/javascript" src="soundplayer.js"></script>
+<script type="text/javascript">
+	
 
+</script>
 </body>
 </html>
