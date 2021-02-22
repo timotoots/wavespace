@@ -786,7 +786,7 @@ function spaceChangeSoundShape(i,param,value){
 		soundOrbits[i].changed = true;
 	} else if(param=="ORBIT_SPEED"){
 		// soundOrbits[i].looptime = mapValues(value,0,1,-20 * 1000,20 * 1000);
-		soundOrbits[i].speed = mapValues(value,0,255,-20,20);
+		soundOrbits[i].speed = mapValues(value,0,255,-30,30);
 
 
 	}

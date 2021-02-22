@@ -23,7 +23,7 @@ var backgrounds = []
 
 
 // https://coolors.co
-
+/*
 
 var out = {
   'name':'Test 0+1+2+3',
@@ -83,18 +83,18 @@ var out = {
 
 backgrounds.push(out);
 
-
+*/
 ///////////////////////////////////////
 
 var out = {
-  'name':'SCAPE1',
+  'name':'Autor: Mihkel Tomberg',
   'colors':["258ea6","549f93","9faf90","e2b1b1","e2c2ff"],
   'status':'stopped',
   'sounds':{
-    'taustad_v2/taust1/1.wav':1,
-    'taustad_v2/taust1/2.wav':2,
-    'taustad_v2/taust1/3.wav':4,
-    'taustad_v2/taust1/4.wav':0
+    'taustad/taust1/1.wav':1,
+    'taustad/taust1/2.wav':2,
+    'taustad/taust1/3.wav':4,
+    'taustad/taust1/4.wav':0
   }
 }
 
@@ -103,14 +103,14 @@ backgrounds.push(out);
 ///////////////////////////////////////
 
 var out = {
-  'name':'SCAPE2',
+  'name':'Autor: Mihkel Tomberg',
   'colors':["cee0dc","b9cfd4","afaab9","b48291","a5243d"],
   'status':'stopped',
   'sounds':{
-    'taustad_v2/taust2/1.wav':1,
-    'taustad_v2/taust2/2.wav':2,
-    'taustad_v2/taust2/3.wav':4,
-    'taustad_v2/taust2/4.wav':0
+    'taustad/taust2/1.wav':1,
+    'taustad/taust2/2.wav':2,
+    'taustad/taust2/3.wav':4,
+    'taustad/taust2/4.wav':0
   }
 }
 
@@ -120,14 +120,14 @@ backgrounds.push(out);
 ///////////////////////////////////////
 
 var out = {
-  'name':'SCAPE3',
+  'name':'Autor: Sander Saarmets',
   'colors':["e08dac","6a7fdb","57e2e5","45cb85","153131"],
   'status':'stopped',
   'sounds':{
-    'taustad_v2/taust3/1.wav':1,
-    'taustad_v2/taust3/2.wav':2,
-    'taustad_v2/taust3/3.wav':4,
-    'taustad_v2/taust3/4.wav':0
+    'taustad/taust3/1.wav':1,
+    'taustad/taust3/2.wav':2,
+    'taustad/taust3/3.wav':4,
+    'taustad/taust3/4.wav':0
   }
 }
 
@@ -136,19 +136,83 @@ backgrounds.push(out);
 ///////////////////////////////////////
 
 var out = {
-  'name':'SCAPE4',
+  'name':'Autor: Sander Saarmets',
   'colors':["f4e409","eeba0b","c36f09","a63c06","710000"],
   'status':'stopped',
   'sounds':{
-    'taustad_v2/taust4/1.wav':1,
-    'taustad_v2/taust4/2.wav':2,
-    'taustad_v2/taust4/3.wav':4,
-    'taustad_v2/taust4/4.wav':0
+    'taustad/taust4/1.wav':1,
+    'taustad/taust4/2.wav':2,
+    'taustad/taust4/3.wav':4,
+    'taustad/taust4/4.wav':0
   }
 }
 
 backgrounds.push(out);
 
+///////////////////////////////////////
+
+var out = {
+  'name':'Autor: Sander Saarmets',
+  'colors':["3d315b","444b6e","708b75","9ab87a","f8f991"],
+  'status':'stopped',
+  'sounds':{
+    'taustad/taust5/1.wav':1,
+    'taustad/taust5/2.wav':2,
+    'taustad/taust5/3.wav':4,
+    'taustad/taust5/4.wav':0
+  }
+}
+
+backgrounds.push(out);
+
+
+///////////////////////////////////////
+
+var out = {
+  'name':'Autor: Sander Saarmets',
+  'colors':["8cff98","aad922","6f7c12","483519","000000"],
+  'status':'stopped',
+  'sounds':{
+    'taustad/taust6/1.wav':1,
+    'taustad/taust6/2.wav':2,
+    'taustad/taust6/3.wav':4,
+    'taustad/taust6/4.wav':0
+  }
+}
+
+backgrounds.push(out);
+
+///////////////////////////////////////
+
+var out = {
+  'name':'Autor: Katrin Enni',
+  'colors':["1f2041","4b3f72","ffc857","119da4","19647e"],
+  'status':'stopped',
+  'sounds':{
+    'taustad/taust7/1.wav':1,
+    'taustad/taust7/2.wav':2,
+    'taustad/taust7/3.wav':4,
+    'taustad/taust7/4.wav':0
+  }
+}
+
+backgrounds.push(out);
+
+///////////////////////////////////////
+
+var out = {
+  'name':'Autor: Katrin Enni',
+  'colors':["5f464b","8e4a49","7daa92","80ffec","c2fbef"],
+  'status':'stopped',
+  'sounds':{
+    'taustad/taust8/1.wav':1,
+    'taustad/taust8/2.wav':2,
+    'taustad/taust8/3.wav':4,
+    'taustad/taust8/4.wav':0
+  }
+}
+
+backgrounds.push(out);
 
 
 function playBackground(i){
@@ -162,7 +226,8 @@ function playBackground(i){
     var player_id = 4;
     for(var file in backgrounds[i].sounds){
 
-      players[player_id].audioElement.src = "../data/" + file;
+      players[player_id].audioElement.src = "../data/" + file + "?random=" + Math.random();
+      console.log("Play background" + "../data/" + file);
       players[player_id].audioElement.play();
 
       var msg = [player_id+1];
@@ -340,7 +405,7 @@ function parseMqtt(topic, message){
       } else if(topic[4]=="TAG_ON"){
 
           console.log("Play player " + controller+": " + message);
-          players[controller].audioElement.src = "../data/linkid_v1/" + message + ".wav"
+          players[controller].audioElement.src = "../data/linkid/" + message + ".wav?random=" + Math.random();
           players[controller].audioElement.play();
 
           var ledColors = {};
@@ -520,7 +585,7 @@ function createPlayer(i){
 
   players[i].audioElement = document.createElement('audio');
   // players[i].audioElement.src = '../data/speaker_test_aki/'+i+'.mp3';
-  players[i].audioElement.src = '../data/helid2/'+i+'.wav';
+  players[i].audioElement.src = '../data/speaker_test_aki/'+i+'.mp3';
 
 
   players[i].audioElement.id = "audioElement"+i
