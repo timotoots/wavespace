@@ -67,10 +67,10 @@ conf.players = [
 
 conf.speakers = [  ];
 
-  for(x=0; x<4;x++){
-	for(y=0; y<3;y++){
+  for(x=0; x<3;x++){
+	for(y=0; y<4	;y++){
 
-		conf.speakers.push([0,x*2000+3000,4300-y*2000+1000, "speaker"]);
+		conf.speakers.push([0,3000+x*1500+3000,4600-y*1500+1000, "speaker"]);
 	}
   }
   conf.speakers.push([0,100000,100000, "speaker"]);

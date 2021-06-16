@@ -146,7 +146,7 @@ function changeOrbit(id, type){
 
 function createSpeaker(id){
 
-	var cubeGeometry = new THREE.BoxBufferGeometry( 150, 10, 150 ); // tartu art house ( 10, 120, 60 );
+	var cubeGeometry = new THREE.BoxBufferGeometry( 100, 10, 100 ); // tartu art house ( 10, 120, 60 );
 	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x424141 } );
 	speakers[id] = new THREE.Mesh( cubeGeometry, wireMaterial );
 	speakers[id].position.set(conf.speakers[id][1]/10,100,680-conf.speakers[id][2]/10);
