@@ -146,7 +146,7 @@ function changeOrbit(id, type){
 
 function createSpeaker(id){
 
-	var cubeGeometry = new THREE.BoxBufferGeometry( 10, 120, 60 );
+	var cubeGeometry = new THREE.BoxBufferGeometry( 150, 10, 150 ); // tartu art house ( 10, 120, 60 );
 	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x424141 } );
 	speakers[id] = new THREE.Mesh( cubeGeometry, wireMaterial );
 	speakers[id].position.set(conf.speakers[id][1]/10,100,680-conf.speakers[id][2]/10);
@@ -306,8 +306,8 @@ function init()
 	sphere.position.set(8210/10,60,680-4250/10);
 
 
-
-	scene.add( sphere );
+	
+	// scene.add( sphere );
 
 
 	// var cubeGeometry = new THREE.CubeGeometry(90,90,60,1,1,1);

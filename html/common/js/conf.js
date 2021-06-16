@@ -65,6 +65,22 @@ conf.players = [
 	}
 ]
 
+conf.speakers = [  ];
+
+  for(x=0; x<4;x++){
+	for(y=0; y<3;y++){
+
+		conf.speakers.push([0,x*2000+3000,4300-y*2000+1000, "speaker"]);
+	}
+  }
+  conf.speakers.push([0,100000,100000, "speaker"]);
+  conf.speakers.push([0,100000,100000, "speaker"]);
+  conf.speakers.push([0,100000,100000, "speaker"]);
+  conf.speakers.push([0,100000,100000, "sub"]);
+
+console.log(conf.speakers)
+  /*
+  Tartu Kunstimaja
 conf.speakers = [
   [0,11330,1700, "speaker"], // 0 ok
   [0,1250,1750, "speaker"], // 1 ok
@@ -84,6 +100,7 @@ conf.speakers = [
   [0,4900,2400, "sub"] // 15 ok - bass
 
 ];
+*/
   conf.subwoofers = [
  
  ]
